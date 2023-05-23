@@ -55,4 +55,14 @@ public class ArrayGame {
             System.out.println();
         }
     }
+
+    public static boolean canMove(int[][] map, int row, int colm) {
+        // Check whether within bounds.
+        if (row < 0 || row >= map.length)
+            return false;
+        if (colm < 0 || colm >= map[row].length)
+            return false;
+        
+        return map[row][colm] == 0;
+    }
 }
