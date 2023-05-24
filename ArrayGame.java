@@ -71,49 +71,29 @@ public class ArrayGame {
 
     public static void move(int[][] map, int rows, int colms) {
         boolean moved = false;
-        // At 0: W and S, at 1: A and D
-        int[] moveAmount = { 0, 0 };
         int rowChange = 0;
         int colmChange = 0;
         while (!moved) {
             String direction = input.nextLine();
 
             if (direction.equalsIgnoreCase("w")) {
-                // moveAmount[0] = -1;
                 colmChange = -1;
                 moved = true;
             } else if (direction.equalsIgnoreCase("a")) {
-                // moveAmount[1] = -1;
                 rowChange = -1;
                 moved = true;
             } else if (direction.equalsIgnoreCase("s")) {
-                // moveAmount[0] = 1;
                 colmChange = 1;
                 moved = true;
             } else if (direction.equalsIgnoreCase("d")) {
-                // moveAmount[1] = 1;
                 rowChange = 1;
                 moved = true;
             }
         }
-
-        // for (int i = 0; i < rows; i++) {
-        // for (int j = 0; j < colms; j++) {
-        // if (map[i][j] == playerValue) {
-        // if (map[i + moveAmount[0]][j] == 0) {
-        // map[i + moveAmount[0]][j] = playerValue;
-        // map[i][j] = 0;
-        // }
-        // if (map[i][j + moveAmount[1]] == 0) {
-        // map[i][j + moveAmount[1]] = playerValue;
-        // map[i][j] = 0;
-        // }
-        // }
-        // }
-        // }
+        int timesMoved = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < colms; j++) {
-                if (map[i][j] == playerValue) {
+                if (map[i][j] == playerValue && timesMoved == 0) {
                     if (map[i + colmChange][j] == 0 && colmChange != 0) {
                         map[i + colmChange][j] = playerValue;
                         map[i][j] = 0;
@@ -121,6 +101,7 @@ public class ArrayGame {
                         map[i][j + rowChange] = playerValue;
                         map[i][j] = 0;
                     }
+                    timesMoved++;
                 }
             }
         }
