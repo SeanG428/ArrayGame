@@ -15,9 +15,13 @@ public class ArrayGame {
         // PLAN FOR GAME:
         // Turn based game
         // 15x15 board with borders (17x17 total)
+        // Many boards to represent different places
+        // Dungeon to explore, town to rest in
+        // Town will include shops, a blacksmith, and a healers lodge
+        // Dungeon will be a visual maze of rooms witha boss at the end
         // 0 = empty space( ), 1 = obstacle(&), 2 = player(#), 3 = enemy(!),
         // 4 = top and bottom borders (_), 5 = side borders(|)
-        // Use location to make enemies move towards player
+        // Use locations to make enemies move towards player
         // Player moves with w, a, s, d input
         // Enemies move after player
         int[][] board = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
@@ -90,10 +94,12 @@ public class ArrayGame {
                 moved = true;
             }
         }
+
         int timesMoved = 0;
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < colms; j++) {
-                if (map[i][j] == playerValue && timesMoved == 0) {
+            int j = 0;
+            while (j < colms && timesMoved == 0) {
+                if (map[i][j] == playerValue) {
                     if (map[i + colmChange][j] == 0 && colmChange != 0) {
                         map[i + colmChange][j] = playerValue;
                         map[i][j] = 0;
@@ -103,6 +109,7 @@ public class ArrayGame {
                     }
                     timesMoved++;
                 }
+                j++;
             }
         }
     }
