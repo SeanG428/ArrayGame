@@ -10,7 +10,6 @@ public class ArrayGame {
     static int obstacleValue = 1;
     static int playerValue = 2;
     static int enemyValue = 3;
-    static int[][] enemyLocations1 = { { 13, 2 }, { 13, 13 }, { 1, 10 } };
 
     public static void main(String[] args) {
         // PLAN FOR GAME:
@@ -141,17 +140,28 @@ public class ArrayGame {
         int rowChange = 0;
         int colmChange = 0;
 
+        int[][] enemyLocations = new int[numOfEnemies][2];
         boolean[] hasMoved = new boolean[numOfEnemies];
+        for (int i = 0; i < numOfEnemies; i++) {
+            for (int j = 0; j < rows; j++) {
+                for (int k = 0; k < colms; k++) {
+                    if (map[j][k] == enemyValue) {
+                        enemyLocations[i][0] = k;
+                        enemyLocations[i][1] = j;
+                    }
+                }
+            }
+        }
 
-        for (int i = 0; i < enemyLocations1.length; i++) {
-            if (enemyLocations1[i][0] < playerRow) {
+        for (int i = 0; i < enemyLocations.length; i++) {
+            if (enemyLocations[i][0] < playerRow) {
                 rowChange = 1;
-            } else if (enemyLocations1[i][0] > playerRow) {
+            } else if (enemyLocations[i][0] > playerRow) {
                 rowChange = -1;
             }
-            if (enemyLocations1[i][1] < playerColm) {
+            if (enemyLocations[i][1] < playerColm) {
                 colmChange = 1;
-            } else if (enemyLocations1[i][1] > playerColm) {
+            } else if (enemyLocations[i][1] > playerColm) {
                 colmChange = -1;
             }
             if (map[i + colmChange][j] == 0) {
