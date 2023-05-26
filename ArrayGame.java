@@ -79,41 +79,34 @@ public class ArrayGame {
 
     public static void move(int[][] map, int rows, int colms) {
         boolean moved = false;
-        int rowChange = 0;
-        int colmChange = 0;
+        int playerColm = 0;
+        int playerRow = 0;
         while (!moved) {
             String direction = input.nextLine();
-
-            if (direction.equalsIgnoreCase("w")) {
-                colmChange = -1;
-                moved = true;
-            } else if (direction.equalsIgnoreCase("a")) {
-                rowChange = -1;
-                moved = true;
-            } else if (direction.equalsIgnoreCase("s")) {
-                colmChange = 1;
-                moved = true;
-            } else if (direction.equalsIgnoreCase("d")) {
-                rowChange = 1;
-                moved = true;
-            }
-        }
-
-        boolean hasMoved = false;
-        for (int i = 0; i < rows; i++) {
-            int j = 0;
-            while (j < colms && hasMoved == false) {
-                if (map[i][j] == playerValue) {
-                    if (map[i + colmChange][j] == 0 && colmChange != 0) {
-                        map[i + colmChange][j] = playerValue;
-                        map[i][j] = 0;
-                    } else if (map[i][j + rowChange] == 0 && rowChange != 0) {
-                        map[i][j + rowChange] = playerValue;
-                        map[i][j] = 0;
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < colms; j++) {
+                    if (map[i][j] == playerValue) {
+                        playerColm = j;
+                        playerRow = i;
                     }
-                    timesMoved++;
                 }
-                j++;
+            }
+            if (direction.equalsIgnoreCase("a") && map[playerRow][playerColm - 1] == 0) {
+                map[playerRow][playerColm - 1] = playerValue;
+                moved = true;
+                map[playerRow][playerColm] = 0;
+            } else if (direction.equalsIgnoreCase("w") && map[playerRow - 1][playerColm] == 0) {
+                map[playerRow - 1][playerColm] = playerValue;
+                moved = true;
+                map[playerRow][playerColm] = 0;
+            } else if (direction.equalsIgnoreCase("d") && map[playerRow][playerColm + 1] == 0) {
+                map[playerRow][playerColm + 1] = playerValue;
+                moved = true;
+                map[playerRow][playerColm] = 0;
+            } else if (direction.equalsIgnoreCase("s") && map[playerRow + 1][playerColm] == 0) {
+                map[playerRow + 1][playerColm] = playerValue;
+                moved = true;
+                map[playerRow][playerColm] = 0;
             }
         }
     }
@@ -140,66 +133,51 @@ public class ArrayGame {
             }
         }
 
-        int rowChange = 0;
-        int colmChange = 0;
-
+        // Locate enemies
         int[][] enemyLocations = new int[numOfEnemies][2];
         boolean[] hasMoved = new boolean[numOfEnemies];
         for (int i = 0; i < numOfEnemies; i++) {
             for (int j = 0; j < rows; j++) {
                 for (int k = 0; k < colms; k++) {
                     if (map[j][k] == enemyValue) {
-                        enemyLocations[i][0] = k;
-                        enemyLocations[i][1] = j;
+                        enemyLocations[i][0] = j;
+                        enemyLocations[i][1] = k;
                     }
                 }
             }
         }
 
-        for (int i = 0; i < enemyLocations.length; i++) {
-            if (enemyLocations[i][0] < playerRow) {
-                rowChange = 1;
-            } else if (enemyLocations[i][0] > playerRow) {
-                rowChange = -1;
+        // Move enemies towards player
+        for (int i = 0; i < hasMoved.length; i++) {
+            if (hasMoved[i] == false) {
+                if (enemyLocations[i][0] < playerRow && map[enemyLocations[i][0] + 1][enemyLocations[i][1]] == 0
+                        || enemyLocations[i][0] < playerRow
+                                && map[enemyLocations[i][0] + 1][enemyLocations[i][1]] == obstacleValue) {
+
+                    map[enemyLocations[i][0] + 1][enemyLocations[i][1]] = enemyValue;
+                    map[enemyLocations[i][0]][enemyLocations[i][1]] = 0;
+                } else if (enemyLocations[i][0] > playerRow && map[enemyLocations[i][0] - 1][enemyLocations[i][1]] == 0
+                        || enemyLocations[i][0] > playerRow
+                                && map[enemyLocations[i][0] - 1][enemyLocations[i][1]] == obstacleValue) {
+
+                    map[enemyLocations[i][0] - 1][enemyLocations[i][1]] = enemyValue;
+                    map[enemyLocations[i][0]][enemyLocations[i][1]] = 0;
+                } else if (enemyLocations[i][1] < playerColm && map[enemyLocations[i][0]][enemyLocations[i][1] + 1] == 0
+                        || enemyLocations[i][1] < playerColm
+                                && map[enemyLocations[i][0]][enemyLocations[i][1] + 1] == obstacleValue) {
+
+                    map[enemyLocations[i][0]][enemyLocations[i][1] + 1] = enemyValue;
+                    map[enemyLocations[i][0]][enemyLocations[i][1]] = 0;
+                } else if (enemyLocations[i][1] > playerColm) {
+                    // if (map[enemyLocations[i][0]][enemyLocations[i][1] - 1] == 0
+                    // || map[enemyLocations[i][0]][enemyLocations[i][1] - 1] == obstacleValue) {
+
+                    map[enemyLocations[i][0]][enemyLocations[i][1] - 1] = enemyValue;
+                    map[enemyLocations[i][0]][enemyLocations[i][1]] = 0;
+                    // }
+                }
+                hasMoved[i] = true;
             }
-            if (enemyLocations[i][1] < playerColm) {
-                colmChange = 1;
-            } else if (enemyLocations[i][1] > playerColm) {
-                colmChange = -1;
-            }
-            if (map[i + colmChange][j] == 0) {
-                map[i + colmChange][j] = enemyValue;
-                map[i][j] = 0;
-            } else if (map[i][j + rowChange] == 0) {
-                map[i][j + rowChange] = enemyValue;
-                map[i][j] = 0;
-            }
-            // Find and move all enemies towards the player
-            // int rowChange = 0;
-            // int colmChange = 0;
-            // for (int i = 0; i < rows; i++) {
-            // for (int j = 0; j < colms; j++) {
-            // if (map[i][j] == enemyValue) {
-            // if (i < playerRow) {
-            // rowChange = 1;
-            // } else if (i > playerRow) {
-            // rowChange = -1;
-            // }
-            // if (j < playerColm) {
-            // colmChange = 1;
-            // } else if (j > playerColm) {
-            // colmChange = -1;
-            // }
-            // if (map[i + colmChange][j] == 0) {
-            // map[i + colmChange][j] = enemyValue;
-            // map[i][j] = 0;
-            // } else if (map[i][j + rowChange] == 0) {
-            // map[i][j + rowChange] = enemyValue;
-            // map[i][j] = 0;
-            // }
-            // }
-            // }
-            // }
         }
     }
 
