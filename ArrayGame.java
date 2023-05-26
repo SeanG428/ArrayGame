@@ -50,7 +50,7 @@ public class ArrayGame {
             printArray(board, board.length, board[0].length);
 
             move(board, board.length, board[0].length);
-            enemyMove(board, board.length, board[0].length);
+            enemyDirection(board, board.length, board[0].length);
         }
     }
 
@@ -111,7 +111,7 @@ public class ArrayGame {
         }
     }
 
-    public static void enemyMove(int[][] map, int rows, int colms) {
+    public static void enemyDirection(int[][] map, int rows, int colms) {
         // Locate player
         int playerColm = 0;
         int playerRow = 0;
@@ -135,7 +135,6 @@ public class ArrayGame {
 
         // Locate enemies
         int[][] enemyLocations = new int[numOfEnemies][2];
-        boolean[] hasMoved = new boolean[numOfEnemies];
         for (int i = 0; i < numOfEnemies; i++) {
             for (int j = 0; j < rows; j++) {
                 for (int k = 0; k < colms; k++) {
@@ -148,36 +147,26 @@ public class ArrayGame {
         }
 
         // Move enemies towards player
-        for (int i = 0; i < hasMoved.length; i++) {
-            if (hasMoved[i] == false) {
-                if (enemyLocations[i][0] < playerRow && map[enemyLocations[i][0] + 1][enemyLocations[i][1]] == 0
-                        || enemyLocations[i][0] < playerRow
-                                && map[enemyLocations[i][0] + 1][enemyLocations[i][1]] == obstacleValue) {
-
-                    map[enemyLocations[i][0] + 1][enemyLocations[i][1]] = enemyValue;
-                    map[enemyLocations[i][0]][enemyLocations[i][1]] = 0;
-                } else if (enemyLocations[i][0] > playerRow && map[enemyLocations[i][0] - 1][enemyLocations[i][1]] == 0
-                        || enemyLocations[i][0] > playerRow
-                                && map[enemyLocations[i][0] - 1][enemyLocations[i][1]] == obstacleValue) {
-
-                    map[enemyLocations[i][0] - 1][enemyLocations[i][1]] = enemyValue;
-                    map[enemyLocations[i][0]][enemyLocations[i][1]] = 0;
-                } else if (enemyLocations[i][1] < playerColm && map[enemyLocations[i][0]][enemyLocations[i][1] + 1] == 0
-                        || enemyLocations[i][1] < playerColm
-                                && map[enemyLocations[i][0]][enemyLocations[i][1] + 1] == obstacleValue) {
-
-                    map[enemyLocations[i][0]][enemyLocations[i][1] + 1] = enemyValue;
-                    map[enemyLocations[i][0]][enemyLocations[i][1]] = 0;
-                } else if (enemyLocations[i][1] > playerColm) {
-                    // if (map[enemyLocations[i][0]][enemyLocations[i][1] - 1] == 0
-                    // || map[enemyLocations[i][0]][enemyLocations[i][1] - 1] == obstacleValue) {
-
-                    map[enemyLocations[i][0]][enemyLocations[i][1] - 1] = enemyValue;
-                    map[enemyLocations[i][0]][enemyLocations[i][1]] = 0;
-                    // }
-                }
-                hasMoved[i] = true;
+        for (int i = 0; i < numOfEnemies; i++) {
+            if (enemyLocations[i][0] < playerRow) {
+                moveEnemy(map, enemyLocations, 1, 0, i);
+            } else if (enemyLocations[i][0] > playerRow) {
+                moveEnemy(map, enemyLocations, -1, 0, i);
+            } else if (enemyLocations[i][1] < playerColm) {
+                moveEnemy(map, enemyLocations, 0, 1, i);
+            } else if (enemyLocations[i][1] > playerColm) {
+                moveEnemy(map, enemyLocations, 0, -1, i);
             }
+        }
+    }
+
+    public static void moveEnemy(int[][] map, int[][] locations, int rowChange, int colmChange, int enemy) {
+        // Check if movement is possible
+        if (map[locations[enemy][0] + rowChange][locations[enemy][1] + colmChange] == 0
+                || map[locations[enemy][0] + rowChange][locations[enemy][1] + colmChange] == obstacleValue) {
+            // Initiate movement
+            map[locations[enemy][0] + rowChange][locations[enemy][1] + colmChange] = enemyValue;
+            map[locations[enemy][0]][locations[enemy][1]] = 0;
         }
     }
 
