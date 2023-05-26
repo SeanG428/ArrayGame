@@ -17,31 +17,14 @@ public class ArrayGame {
         // 15x15 board with borders (17x17 total)
         // Many boards to represent different places
         // Dungeon to explore, town to rest in
-        // Town will include shops, a blacksmith, and a healers lodge
-        // Dungeon will be a visual maze of rooms witha boss at the end
+        // Town will include shops, a blacksmith, a healers lodge, and a couple houses
+        // Dungeon will be a visual maze of rooms with a boss at the end
         // 0 = empty space( ), 1 = obstacle(&), 2 = player(#), 3 = enemy(!),
         // 4 = top and bottom borders (_), 5 = side borders(|)
         // 6 = Doors and paths (X)
         // Use locations to make enemies move towards player
         // Player moves with w, a, s, d input
         // Enemies move after player
-        // int[][] board = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
-        //         { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 5 },
-        //         { 5, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 5 },
-        //         { 5, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-        //         { 5, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-        //         { 5, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 5 },
-        //         { 5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 5 },
-        //         { 5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 5 },
-        //         { 5, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 5 },
-        //         { 5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-        //         { 5, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 5 },
-        //         { 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-        //         { 5, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 5 },
-        //         { 5, 0, 3, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 3, 1, 0, 5 },
-        //         { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 5 },
-        //         { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-        //         { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 } };
 
         boolean done = false;
         int[][] board = arrayImages("dungeonStart");
@@ -49,11 +32,13 @@ public class ArrayGame {
 
         while (!done) {
             System.out.print("\033[H\033[2J");
-            
+
             printArray(board, board.length, board[0].length);
 
-            move(board, board.length, board[0].length);
+            movePlayer(board, board.length, board[0].length);
+
             enemyDirection(board, board.length, board[0].length);
+            String test = input.nextLine();
         }
     }
 
@@ -80,7 +65,7 @@ public class ArrayGame {
         }
     }
 
-    public static void move(int[][] map, int rows, int colms) {
+    public static void movePlayer(int[][] map, int rows, int colms) {
         boolean moved = false;
         int playerColm = 0;
         int playerRow = 0;
@@ -114,6 +99,13 @@ public class ArrayGame {
         }
     }
 
+    public static void doors(String roomName, int[][] location) {
+        // TODO
+        // Create method that sends the player to the proper room
+        // Base the decision on the current room and the location of the player
+        // (eg. "Town, row #, collumn #")
+    }
+
     public static void enemyDirection(int[][] map, int rows, int colms) {
         // Locate player
         int playerColm = 0;
@@ -126,6 +118,7 @@ public class ArrayGame {
                 }
             }
         }
+
         // Count enemies
         int numOfEnemies = 0;
         for (int i = 0; i < rows; i++) {
@@ -139,41 +132,68 @@ public class ArrayGame {
         // Locate enemies
         int[][] enemyLocations = new int[numOfEnemies][2];
         for (int i = 0; i < numOfEnemies; i++) {
+            int timesSet = 0;
             for (int j = 0; j < rows; j++) {
                 for (int k = 0; k < colms; k++) {
-                    if (map[j][k] == enemyValue) {
+                    if (map[j][k] == enemyValue && timesSet <= i) {
                         enemyLocations[i][0] = j;
                         enemyLocations[i][1] = k;
+                        timesSet++;
                     }
                 }
             }
         }
 
+        // Check enemy coordinates
+        // for (int j = 0; j < enemyLocations.length; j++) {
+        //     for (int k = 0; k < enemyLocations[0].length; k++) {
+        //         System.out.print(enemyLocations[j][k] + " "); 
+        //     }
+        //     System.out.println();
+        // }
+
         // Move enemies towards player
         for (int i = 0; i < numOfEnemies; i++) {
             if (enemyLocations[i][0] < playerRow) {
-                moveEnemy(map, enemyLocations, 1, 0, i);
+                moveEnemy(map, enemyLocations[i][0], enemyLocations[i][1], 1, 0);
             } else if (enemyLocations[i][0] > playerRow) {
-                moveEnemy(map, enemyLocations, -1, 0, i);
+                moveEnemy(map, enemyLocations[i][0], enemyLocations[i][1], -1, 0);
             } else if (enemyLocations[i][1] < playerColm) {
-                moveEnemy(map, enemyLocations, 0, 1, i);
+                moveEnemy(map, enemyLocations[i][0], enemyLocations[i][1], 0, 1);
             } else if (enemyLocations[i][1] > playerColm) {
-                moveEnemy(map, enemyLocations, 0, -1, i);
+                moveEnemy(map, enemyLocations[i][0], enemyLocations[i][1], 0, -1);
             }
         }
     }
 
-    public static void moveEnemy(int[][] map, int[][] locations, int rowChange, int colmChange, int enemy) {
+    public static void moveEnemy(int[][] map, int row, int colm, int rowChange, int colmChange) {
         // Check if movement is possible
-        if (map[locations[enemy][0] + rowChange][locations[enemy][1] + colmChange] == 0
-                || map[locations[enemy][0] + rowChange][locations[enemy][1] + colmChange] == obstacleValue) {
+        if (map[row + rowChange][colm + colmChange] == 0
+                || map[row + rowChange][colm + colmChange] == obstacleValue) {
             // Initiate movement
-            map[locations[enemy][0] + rowChange][locations[enemy][1] + colmChange] = enemyValue;
-            map[locations[enemy][0]][locations[enemy][1]] = 0;
+            map[row + rowChange][colm + colmChange] = enemyValue;
+            map[row][colm] = 0;
         }
     }
 
+    public static void battle() {
+        // TODO:
+        // Create battle mechanics
+        // Loop until battle is over
+        // Return player to the last place they were
+    }
+
+    public static void inventory(int[][] inventory) {
+        // TODO
+        // Create inventory array (2 dimentional)
+        // Player should be able to organise their inventory (swap)
+        // Player should be able to select items to use
+        // Inventory should automatically shift items over when a slot is empty
+    }
+
     public static int[][] arrayImages(String name) {
+        // TODO
+        // Finish the image arrays for the locations
         if (name.equals("town")) {
             int[][] town = {};
             return town;
@@ -186,9 +206,6 @@ public class ArrayGame {
         } else if (name.equals("house2")) {
             int[][] house2 = {};
             return house2;
-        } else if (name.equals("inventory")) {
-            int[][] inventory = {};
-            return inventory;
         } else if (name.equals("dungeonStart")) {
             int[][] start = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 5 },
