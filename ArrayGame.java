@@ -38,7 +38,8 @@ public class ArrayGame {
             movePlayer(board, board.length, board[0].length);
 
             enemyDirection(board, board.length, board[0].length);
-            String test = input.nextLine();
+
+
         }
     }
 
@@ -65,36 +66,47 @@ public class ArrayGame {
         }
     }
 
-    public static void movePlayer(int[][] map, int rows, int colms) {
-        boolean moved = false;
-        int playerColm = 0;
-        int playerRow = 0;
-        while (!moved) {
-            String direction = input.nextLine();
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < colms; j++) {
-                    if (map[i][j] == playerValue) {
-                        playerColm = j;
-                        playerRow = i;
-                    }
+    public static int[] playerLoc(int[][] map) {
+        int[] currentLocation = new int[2];
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                if (map[i][j] == playerValue) {
+                    currentLocation[0] = i;
+                    currentLocation[1] = j;
+                    // Return as soon as player is found
+                    return currentLocation;
                 }
             }
-            if (direction.equalsIgnoreCase("a") && map[playerRow][playerColm - 1] == 0) {
-                map[playerRow][playerColm - 1] = playerValue;
+        }
+        // Return if no player is found
+        // Should never happen
+        return null;
+    }
+
+    public static void movePlayer(int[][] map, int rows, int colms) {
+        int[] currentPlayerLoc = playerLoc(map);
+
+        boolean moved = false;
+
+        while (!moved) {
+            String direction = input.nextLine();
+            
+            if (direction.equalsIgnoreCase("a") && map[currentPlayerLoc[0]][currentPlayerLoc[1] - 1] == 0) {
+                map[currentPlayerLoc[0]][currentPlayerLoc[1] - 1] = playerValue;
                 moved = true;
-                map[playerRow][playerColm] = 0;
-            } else if (direction.equalsIgnoreCase("w") && map[playerRow - 1][playerColm] == 0) {
-                map[playerRow - 1][playerColm] = playerValue;
+                map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
+            } else if (direction.equalsIgnoreCase("w") && map[currentPlayerLoc[0] - 1][currentPlayerLoc[1]] == 0) {
+                map[currentPlayerLoc[0] - 1][currentPlayerLoc[1]] = playerValue;
                 moved = true;
-                map[playerRow][playerColm] = 0;
-            } else if (direction.equalsIgnoreCase("d") && map[playerRow][playerColm + 1] == 0) {
-                map[playerRow][playerColm + 1] = playerValue;
+                map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
+            } else if (direction.equalsIgnoreCase("d") && map[currentPlayerLoc[0]][currentPlayerLoc[1] + 1] == 0) {
+                map[currentPlayerLoc[0]][currentPlayerLoc[1] + 1] = playerValue;
                 moved = true;
-                map[playerRow][playerColm] = 0;
-            } else if (direction.equalsIgnoreCase("s") && map[playerRow + 1][playerColm] == 0) {
-                map[playerRow + 1][playerColm] = playerValue;
+                map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
+            } else if (direction.equalsIgnoreCase("s") && map[currentPlayerLoc[0] + 1][currentPlayerLoc[1]] == 0) {
+                map[currentPlayerLoc[0] + 1][currentPlayerLoc[1]] = playerValue;
                 moved = true;
-                map[playerRow][playerColm] = 0;
+                map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
             }
         }
     }
@@ -106,18 +118,28 @@ public class ArrayGame {
         // (eg. "Town, row #, collumn #")
     }
 
-    public static void enemyDirection(int[][] map, int rows, int colms) {
-        // Locate player
-        int playerColm = 0;
-        int playerRow = 0;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < colms; j++) {
-                if (map[i][j] == playerValue) {
-                    playerRow = i;
-                    playerColm = j;
+    public static int[][] enemyLocations(int[][] map, int numOfEnemies) {
+        // Locate enemies
+        int[][] enemyLoc = new int[numOfEnemies][2];
+        for (int i = 0; i < numOfEnemies; i++) {
+            // Times set variable prevents the correct location from being overwritten
+            int timesSet = 0;
+            for (int j = 0; j < map.length; j++) {
+                for (int k = 0; k < map[0].length; k++) {
+                    if (map[j][k] == enemyValue && timesSet <= i) {
+                        enemyLoc[i][0] = j;
+                        enemyLoc[i][1] = k;
+                        timesSet++;
+                    }
                 }
             }
         }
+        return enemyLoc;
+    }
+
+    public static void enemyDirection(int[][] map, int rows, int colms) {
+        // Locate player
+        int[] currentPlayerLoc = playerLoc(map);
 
         // Count enemies
         int numOfEnemies = 0;
@@ -129,39 +151,26 @@ public class ArrayGame {
             }
         }
 
-        // Locate enemies
-        int[][] enemyLocations = new int[numOfEnemies][2];
-        for (int i = 0; i < numOfEnemies; i++) {
-            int timesSet = 0;
-            for (int j = 0; j < rows; j++) {
-                for (int k = 0; k < colms; k++) {
-                    if (map[j][k] == enemyValue && timesSet <= i) {
-                        enemyLocations[i][0] = j;
-                        enemyLocations[i][1] = k;
-                        timesSet++;
-                    }
-                }
-            }
-        }
+        int[][] enemyLocs = enemyLocations(map, numOfEnemies);
 
         // Check enemy coordinates
         // for (int j = 0; j < enemyLocations.length; j++) {
-        //     for (int k = 0; k < enemyLocations[0].length; k++) {
-        //         System.out.print(enemyLocations[j][k] + " "); 
-        //     }
-        //     System.out.println();
+        // for (int k = 0; k < enemyLocations[0].length; k++) {
+        // System.out.print(enemyLocations[j][k] + " ");
+        // }
+        // System.out.println();
         // }
 
         // Move enemies towards player
         for (int i = 0; i < numOfEnemies; i++) {
-            if (enemyLocations[i][0] < playerRow) {
-                moveEnemy(map, enemyLocations[i][0], enemyLocations[i][1], 1, 0);
-            } else if (enemyLocations[i][0] > playerRow) {
-                moveEnemy(map, enemyLocations[i][0], enemyLocations[i][1], -1, 0);
-            } else if (enemyLocations[i][1] < playerColm) {
-                moveEnemy(map, enemyLocations[i][0], enemyLocations[i][1], 0, 1);
-            } else if (enemyLocations[i][1] > playerColm) {
-                moveEnemy(map, enemyLocations[i][0], enemyLocations[i][1], 0, -1);
+            if (enemyLocs[i][0] < currentPlayerLoc[0]) {
+                moveEnemy(map, enemyLocs[i][0], enemyLocs[i][1], 1, 0);
+            } else if (enemyLocs[i][0] > currentPlayerLoc[0]) {
+                moveEnemy(map, enemyLocs[i][0], enemyLocs[i][1], -1, 0);
+            } else if (enemyLocs[i][1] < currentPlayerLoc[1]) {
+                moveEnemy(map, enemyLocs[i][0], enemyLocs[i][1], 0, 1);
+            } else if (enemyLocs[i][1] > currentPlayerLoc[1]) {
+                moveEnemy(map, enemyLocs[i][0], enemyLocs[i][1], 0, -1);
             }
         }
     }
@@ -174,6 +183,12 @@ public class ArrayGame {
             map[row + rowChange][colm + colmChange] = enemyValue;
             map[row][colm] = 0;
         }
+    }
+
+    public static void checkForEnemies(int[][] map) {
+        // Near enemies are one space away from the player
+        // Not diagonally
+        int numOfNearEnemies = 0;
     }
 
     public static void battle() {
