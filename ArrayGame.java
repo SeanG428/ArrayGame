@@ -23,46 +23,71 @@ public class ArrayGame {
         // 4 = top and bottom borders (_), 5 = side borders(|)
         // 6 = Doors and paths (X)
         // Use locations to make enemies move towards player
-        // Player moves with w, a, s, d input
+        // Player moves with w, a, s, d, x input
         // Enemies move after player
 
         boolean done = false;
         int[][] board = arrayImages("dungeonStart");
         board[8][8] = playerValue;
 
+        clear();
+        printArray(board, board.length, board[0].length);
+
         while (!done) {
-            System.out.print("\033[H\033[2J");
-
-            printArray(board, board.length, board[0].length);
-
             movePlayer(board, board.length, board[0].length);
 
             enemyDirection(board, board.length, board[0].length);
 
+            int numOfNearEnemies = checkForEnemies(board);
+            if (numOfNearEnemies > 0) {
+                battle(numOfNearEnemies);
+            }
 
+            clear();
+            printArray(board, board.length, board[0].length);
         }
+    }
+
+    public static void clear() {
+        System.out.print("\033[H\033[2J");
+    }
+
+    public static void prns(String text) {
+
+    }
+
+    public static void prn(String text) {
+        System.out.println(text);
+    }
+
+    public static void prn(int text) {
+        System.out.println(text);
+    }
+
+    public static void prt(String text) {
+        System.out.print(text);
     }
 
     public static void printArray(int array[][], int rows, int colms) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < colms; j++) {
                 if (array[i][j] == 0) {
-                    System.out.print("   ");
+                    prt("   ");
                 } else if (array[i][j] == 1) {
-                    System.out.print(" & ");
+                    prt(" & ");
                 } else if (array[i][j] == 2) {
-                    System.out.print(" # ");
+                    prt(" # ");
                 } else if (array[i][j] == 3) {
-                    System.out.print(" ! ");
+                    prt(" ! ");
                 } else if (array[i][j] == 4) {
-                    System.out.print("---");
+                    prt("---");
                 } else if (array[i][j] == 5) {
-                    System.out.print(" | ");
+                    prt(" | ");
                 } else {
-                    System.out.print(" X ");
+                    prt(" X ");
                 }
             }
-            System.out.println();
+            prn("");
         }
     }
 
@@ -90,7 +115,7 @@ public class ArrayGame {
 
         while (!moved) {
             String direction = input.nextLine();
-            
+
             if (direction.equalsIgnoreCase("a") && map[currentPlayerLoc[0]][currentPlayerLoc[1] - 1] == 0) {
                 map[currentPlayerLoc[0]][currentPlayerLoc[1] - 1] = playerValue;
                 moved = true;
@@ -103,10 +128,12 @@ public class ArrayGame {
                 map[currentPlayerLoc[0]][currentPlayerLoc[1] + 1] = playerValue;
                 moved = true;
                 map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
-            } else if (direction.equalsIgnoreCase("s") && map[currentPlayerLoc[0] + 1][currentPlayerLoc[1]] == 0) {
+            } else if (direction.equalsIgnoreCase("x") && map[currentPlayerLoc[0] + 1][currentPlayerLoc[1]] == 0) {
                 map[currentPlayerLoc[0] + 1][currentPlayerLoc[1]] = playerValue;
                 moved = true;
                 map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
+            } else if (direction.equalsIgnoreCase("s")) {
+                moved = true;
             }
         }
     }
@@ -116,6 +143,18 @@ public class ArrayGame {
         // Create method that sends the player to the proper room
         // Base the decision on the current room and the location of the player
         // (eg. "Town, row #, collumn #")
+    }
+
+    public static int numOfEnemies(int[][] map) {
+        int enemies = 0;
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                if (map[i][j] == enemyValue) {
+                    enemies++;
+                }
+            }
+        }
+        return enemies;
     }
 
     public static int[][] enemyLocations(int[][] map, int numOfEnemies) {
@@ -142,27 +181,20 @@ public class ArrayGame {
         int[] currentPlayerLoc = playerLoc(map);
 
         // Count enemies
-        int numOfEnemies = 0;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < colms; j++) {
-                if (map[i][j] == enemyValue) {
-                    numOfEnemies++;
-                }
-            }
-        }
+        int enemies = numOfEnemies(map);
 
-        int[][] enemyLocs = enemyLocations(map, numOfEnemies);
+        int[][] enemyLocs = enemyLocations(map, enemies);
 
-        // Check enemy coordinates
+        // Check enemy coordinates (print)
         // for (int j = 0; j < enemyLocations.length; j++) {
         // for (int k = 0; k < enemyLocations[0].length; k++) {
-        // System.out.print(enemyLocations[j][k] + " ");
+        // prt(enemyLocations[j][k] + " ");
         // }
-        // System.out.println();
+        // prn();
         // }
 
         // Move enemies towards player
-        for (int i = 0; i < numOfEnemies; i++) {
+        for (int i = 0; i < enemies; i++) {
             if (enemyLocs[i][0] < currentPlayerLoc[0]) {
                 moveEnemy(map, enemyLocs[i][0], enemyLocs[i][1], 1, 0);
             } else if (enemyLocs[i][0] > currentPlayerLoc[0]) {
@@ -192,23 +224,39 @@ public class ArrayGame {
 
         int[] currentPlayerLoc = playerLoc(map);
 
-        int[][] enemyLocs = enemyLocations(map);
+        int enemies = numOfEnemies(map);
+
+        int[][] enemyLocs = enemyLocations(map, enemies);
 
         for (int i = 0; i < enemyLocs.length; i++) {
-            if (currentPlayerLoc[0] + 1 == enemyLocs[i][0] || currentPlayerLoc[0] - 1 == enemyLocs[i][0]) {
+            if (currentPlayerLoc[0] + 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1]
+                    || currentPlayerLoc[0] - 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1]) {
                 numOfNearEnemies++;
-            } else if (currentPlayerLoc[1] + 1 == enemyLocs[i][1] || currentPlayerLoc[1] - 1 == enemyLocs[i][1]) {
+            } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] + 1 == enemyLocs[i][1]
+                    || currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] - 1 == enemyLocs[i][1]) {
                 numOfNearEnemies++;
             }
         }
         return numOfNearEnemies;
     }
 
-    public static void battle() {
+    public static void battle(int enemies) {
         // TODO:
         // Create battle mechanics
         // Loop until battle is over
         // Return player to the last place they were
+        clear();
+        if (enemies > 1) {
+            prn("You've encountered " + enemies + " enemies");
+        } else {
+            prn("You've encountered an enemy");
+        }
+        prn("(Press ENTER)");
+        input.nextLine();
+
+        // TODO
+        // Print fight graphics
+
     }
 
     public static void inventory(int[][] inventory) {
