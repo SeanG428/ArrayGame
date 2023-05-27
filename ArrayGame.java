@@ -185,10 +185,23 @@ public class ArrayGame {
         }
     }
 
-    public static void checkForEnemies(int[][] map) {
+    public static int checkForEnemies(int[][] map) {
         // Near enemies are one space away from the player
         // Not diagonally
         int numOfNearEnemies = 0;
+
+        int[] currentPlayerLoc = playerLoc(map);
+
+        int[][] enemyLocs = enemyLocations(map);
+
+        for (int i = 0; i < enemyLocs.length; i++) {
+            if (currentPlayerLoc[0] + 1 == enemyLocs[i][0] || currentPlayerLoc[0] - 1 == enemyLocs[i][0]) {
+                numOfNearEnemies++;
+            } else if (currentPlayerLoc[1] + 1 == enemyLocs[i][1] || currentPlayerLoc[1] - 1 == enemyLocs[i][1]) {
+                numOfNearEnemies++;
+            }
+        }
+        return numOfNearEnemies;
     }
 
     public static void battle() {
@@ -200,8 +213,12 @@ public class ArrayGame {
 
     public static void inventory(int[][] inventory) {
         // TODO
-        // Create inventory array (2 dimentional)
+        // Create inventory array (3 dimentional)
+        // First dimention: type/catagory
+        // Second dimention: row
+        // Third dimention: collumn
         // Player should be able to organise their inventory (swap)
+        // Items can only be swapped with other items in their catagory
         // Player should be able to select items to use
         // Inventory should automatically shift items over when a slot is empty
     }
