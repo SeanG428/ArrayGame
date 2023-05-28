@@ -11,7 +11,18 @@ public class ArrayGame {
     static int playerValue = 2;
     static int enemyValue = 3;
 
-    // static String[] arrowType = {"Normal", "Fire", "Poison", "Explosive"};
+    static int[][][] playerInventory = {
+            { { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0 } },
+            { { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0 } } };
+
+    // static String[] arrowType = {"Stone tipped arrow", "Metal tipped arrow",
+    // "Explosive tipped arrow"};
 
     public static void main(String[] args) throws Exception {
         // PLAN FOR GAME:
@@ -140,6 +151,8 @@ public class ArrayGame {
                 map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
             } else if (direction.equalsIgnoreCase("s")) {
                 moved = true;
+            } else if (direction.equalsIgnoreCase("i")) {
+                printInventory(0);
             }
         }
     }
@@ -260,6 +273,12 @@ public class ArrayGame {
         prnSlow("(Press ENTER)");
         input.nextLine();
 
+        // Set enemy health
+        int[] enemyHealth = new int[enemies];
+        for (int i = 0; i < enemies; i++) {
+            enemyHealth[i] = 50;
+        }
+
         boolean fighting = true;
         while (fighting == true) {
             // Display battle options
@@ -272,12 +291,15 @@ public class ArrayGame {
             int damage = 0;
             if (selection == 1) {
                 attacks("sword", enemies);
+                clear();
+                String sword = inventory("weapons", "sword");
             } else if (selection == 2) {
                 attacks("bow", enemies);
+                clear();
+                String sword = inventory("weapons", "sword");
             } else {
-                // inventory();
+                displayInventory();
             }
-            clear();
 
         }
     }
@@ -312,7 +334,8 @@ public class ArrayGame {
         }
     }
 
-    public static void printSwordAttack(String player[], String[] enemy, int spaceFront, int spaceBack, int numOfEnemies) {
+    public static void printSwordAttack(String player[], String[] enemy, int spaceFront, int spaceBack,
+            int numOfEnemies) {
         for (int i = 0; i < player.length; i++) {
             for (int j = 0; j < spaceBack; j++) {
                 prt(" ");
@@ -328,7 +351,8 @@ public class ArrayGame {
         }
     }
 
-    public static void printBowAttack(String player[], String[] enemy, String arrow, int distance, int spaceFront, int spaceBack, int numOfEnemies) {
+    public static void printBowAttack(String player[], String[] enemy, String arrow, int distance, int spaceFront,
+            int spaceBack, int numOfEnemies) {
         for (int i = 0; i < player.length; i++) {
             prt(player[i]);
             if (i == player.length / 2) {
@@ -353,10 +377,11 @@ public class ArrayGame {
         }
     }
 
-    public static void inventory(int[][] inventory) {
+    public static void inventory() {
         // TODO
         // Create inventory array (3 dimentional)
         // First dimention: type/catagory
+        // 1: Weapons, 2: Heals, 3: items
         // Second dimention: row
         // Third dimention: collumn
         // Player should be able to organise their inventory (swap)
@@ -364,6 +389,58 @@ public class ArrayGame {
         // Player should be able to select items to use
         // Inventory should automatically shift items over when a slot is empty
         // Items in use (sword, bow, etc.) will be in special slots
+        // Colours indicate what items are better
+
+    }
+
+    public static void printInventory(int catagory) {
+        clear();
+        for (int i = 0; i < playerInventory[0].length; i++) {
+            for (int j = 0; j < playerInventory[0][0].length; j++) {
+                if (playerInventory[catagory][i][j] == 0) {
+                    prt("   ");
+                } else if (playerInventory[catagory][i][j] == -1) {
+                    prt("---");
+                } else if (playerInventory[catagory][i][j] == -2) {
+                    prt(" | ");
+                }
+                if (catagory == 0) {
+                    // Weapons
+                    if (playerInventory[catagory][i][j] == 20 || playerInventory[catagory][i][j] == 30
+                            || playerInventory[catagory][i][j] == 50) {
+                        // Print sword
+                        // Damage = number
+                        prt(" / ");
+                    } else if (playerInventory[catagory][i][j] == 1 || playerInventory[catagory][i][j] == 2) {
+                        // Print bow
+                        // Bow number multiplies arrow damage by its value
+                        prt(" ) ");
+                    } else if (playerInventory[catagory][i][j] == 10 || playerInventory[catagory][i][j] == 15
+                            || playerInventory[catagory][i][j] == 25) {
+                        // Print arrow
+                        // Arrow damage = number
+                        prt(" > ");
+                    }
+                } else {
+                    // Heals
+                    if (playerInventory[catagory][i][j] == 10) {
+                        // Print small heal
+                        prt(" . ");
+                    } else if (playerInventory[catagory][i][j] == 20) {
+                        // Print medium heal
+                        prt(" O ");
+                    } else if (playerInventory[catagory][i][j] == 30) {
+                        // Print large heal
+                        prt("(_)");
+                    } else {
+                        // Print suspiciuos heal
+                        // Using this item may make the user lose health
+                        prt("_'-");
+                    }
+                }
+            }
+            prn("");
+        }
     }
 
     public static int[][] arrayImages(String name) {
