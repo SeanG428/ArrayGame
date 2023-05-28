@@ -513,18 +513,36 @@ public class ArrayGame {
                 }
                 if (catagory == 0) {
                     // Weapons
-                    if (playerInventory[catagory][i][j] == 20 || playerInventory[catagory][i][j] == 30
-                            || playerInventory[catagory][i][j] == 50) {
-                        // Print sword
+                    if (playerInventory[catagory][i][j] == 20) {
+                        // Print basic sword
                         // Damage = number
                         prt(" / ");
-                    } else if (playerInventory[catagory][i][j] == 1 || playerInventory[catagory][i][j] == 2) {
-                        // Print bow
+                    } else if (playerInventory[catagory][i][j] == 30) {
+                        // Print rare sword
+                        // Damage = number
+                        prt(" / ");
+                    } else if (playerInventory[catagory][i][j] == 50) {
+                        // Print legendary sword
+                        // Damage = number
+                        prt(" / ");
+                    } else if (playerInventory[catagory][i][j] == 1) {
+                        // Print basic bow
                         // Bow number multiplies arrow damage by its value
                         prt(" ) ");
-                    } else if (playerInventory[catagory][i][j] == 10 || playerInventory[catagory][i][j] == 15
-                            || playerInventory[catagory][i][j] == 25) {
-                        // Print arrow
+                    } else if (playerInventory[catagory][i][j] == 2) {
+                        // Print legendary bow
+                        // Bow number multiplies arrow damage by its value
+                        prt(" ) ");
+                    } else if (playerInventory[catagory][i][j] == 10) {
+                        // Print normal arrow
+                        // Arrow damage = number
+                        prt(" > ");
+                    } else if (playerInventory[catagory][i][j] == 15) {
+                        // Print sharp arrow
+                        // Arrow damage = number
+                        prt(" > ");
+                    } else if (playerInventory[catagory][i][j] == 25) {
+                        // Print explosive arrow
                         // Arrow damage = number
                         prt(" > ");
                     }
