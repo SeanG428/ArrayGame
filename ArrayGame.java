@@ -280,19 +280,23 @@ public class ArrayGame {
         for (int slot = 0; slot < numOfNearEnemies; slot++) {
             int timesSet = 0;
             for (int i = 0; i < enemies; i++) {
-                if (currentPlayerLoc[0] + 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1] && timesSet <= slot) {
+                if (currentPlayerLoc[0] + 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1]
+                        && timesSet <= slot) {
                     nearEnemyLocs[slot][0] = enemyLocs[i][0];
                     nearEnemyLocs[slot][1] = enemyLocs[i][1];
                     timesSet++;
-                } else if (currentPlayerLoc[0] - 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1] && timesSet <= slot) {
+                } else if (currentPlayerLoc[0] - 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1]
+                        && timesSet <= slot) {
                     nearEnemyLocs[slot][0] = enemyLocs[i][0];
                     nearEnemyLocs[slot][1] = enemyLocs[i][1];
                     timesSet++;
-                } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] + 1 == enemyLocs[i][1] && timesSet <= slot) {
+                } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] + 1 == enemyLocs[i][1]
+                        && timesSet <= slot) {
                     nearEnemyLocs[slot][0] = enemyLocs[i][0];
                     nearEnemyLocs[slot][1] = enemyLocs[i][1];
                     timesSet++;
-                } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] - 1 == enemyLocs[i][1] && timesSet <= slot) {
+                } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] - 1 == enemyLocs[i][1]
+                        && timesSet <= slot) {
                     nearEnemyLocs[slot][0] = enemyLocs[i][0];
                     nearEnemyLocs[slot][1] = enemyLocs[i][1];
                     timesSet++;
@@ -320,16 +324,21 @@ public class ArrayGame {
         // Set enemy health
         int[] enemyHealth = new int[enemies];
         for (int i = 0; i < enemies; i++) {
-            enemyHealth[i] = 10;
+            enemyHealth[i] = 30;
         }
+
+        int enemiesLeft = enemies;
 
         boolean fighting = true;
         while (fighting == true) {
+            int defeatedEnemies = 0;
+
             for (int enemyHealthDisplay = 0; enemyHealthDisplay < enemyHealth.length; enemyHealthDisplay++) {
                 prnSlow("Enemy " + (enemyHealthDisplay + 1) + " has " + enemyHealth[enemyHealthDisplay]
                         + " health points");
             }
             prnSlow("You have " + playerHealth + " health points");
+
             // Display battle options
             String[] battleOptions = { "Sword strike", "Bow shot", "Inventory" };
             for (int i = 0; i < battleOptions.length; i++) {
@@ -338,34 +347,50 @@ public class ArrayGame {
             int selection = Integer.parseInt(input.nextLine());
 
             if (selection == 1) {
-                attacks("sword", enemies);
-                clear();
-                enemyHealth[0] -= playerInventory[0][1][1];
+                int choice = 0;
+                if (enemiesLeft > 1) {
+                    prnSlow("Which enemy will you attack?");
+                    for (int count = 0; count < enemiesLeft; count++) {
+                        prnSlow((count + 1) + ")  Enemy " + (count + 1));
+                    }
+                    choice = (Integer.parseInt(input.nextLine())) - 1;
+                } else {
+                    for (int i = 0; i < enemyLocs.length; i++) {
+                        if (enemyHealth[i] > 0) {
+                            choice = i;
+                        }
+                    }
+                }
+                attacks("sword", enemiesLeft);
+                enemyHealth[choice] -= playerInventory[0][1][1];
             } else if (selection == 2) {
-                attacks("bow", enemies);
-                clear();
-                for (int j = 0; j < enemies; j++) {
+                attacks("bow", enemiesLeft);
+                for (int j = 0; j < enemiesLeft; j++) {
                     enemyHealth[j] -= playerInventory[0][3][1] * playerInventory[0][5][1];
                 }
             } else {
                 inventory();
             }
-
             // Check is there are any enemies left
-            int aliveEnemies = 0;
-            for (int i = 0; i < enemies; i++) {
-                if (enemyHealth[i] > 0) {
-                    aliveEnemies++;
+            for (int i = 0; i < enemyLocs.length; i++) {
+                if (enemyHealth[i] <= 0) {
+                    defeatedEnemies++;
+                    enemyHealth[i] = 0;
                 }
             }
-            enemies = aliveEnemies;
+            enemiesLeft = enemies - defeatedEnemies;
             // End fight if there are no enemies
-            if (aliveEnemies == 0) {
+            if (enemiesLeft == 0) {
                 // Delete defeated enemies from map
                 for (int i = 0; i < enemyLocs.length; i++) {
                     map[enemyLocs[i][0]][enemyLocs[i][1]] = 0;
                 }
                 fighting = false;
+            } else {
+                attacks("enemy", enemiesLeft);
+                for (int i = 0; i < enemiesLeft; i++) {
+                    playerHealth -= 10;
+                }
             }
         }
     }
@@ -388,7 +413,7 @@ public class ArrayGame {
                 Thread.sleep(80);
                 spaceBack++;
             }
-        } else {
+        } else if (attackType.equals("bow")) {
             int spaceBack = 0;
             int distance = 40;
             for (int i = distance; i > 0; i--) {
@@ -397,7 +422,14 @@ public class ArrayGame {
                 Thread.sleep(80);
                 spaceBack++;
             }
+        } else if (attackType.equals("enemy")) {
+            for (int i = 20; i > 0; i--) {
+                clear();
+                printEnemyAttack(playerWithSword, enemy, i, numOfEnemies);
+                Thread.sleep(80);
+            }
         }
+        clear();
     }
 
     public static void printSwordAttack(String player[], String[] enemy, int spaceFront, int spaceBack,
@@ -437,6 +469,20 @@ public class ArrayGame {
                 }
             }
             for (int m = 0; m < numOfEnemies; m++) {
+                prt(enemy[i]);
+            }
+            prn("");
+        }
+    }
+
+    public static void printEnemyAttack(String player[], String[] enemy, int spaceFront,
+            int numOfEnemies) {
+        for (int i = 0; i < player.length; i++) {
+            prt(player[i]);
+            for (int j = 0; j < spaceFront; j++) {
+                prt(" ");
+            }
+            for (int k = 0; k < numOfEnemies; k++) {
                 prt(enemy[i]);
             }
             prn("");
@@ -653,7 +699,7 @@ public class ArrayGame {
             int[][] start = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 5 },
-                    { 5, 0, 1, 3, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 5 },
