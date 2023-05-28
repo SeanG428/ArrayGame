@@ -11,6 +11,8 @@ public class ArrayGame {
     static int playerValue = 2;
     static int enemyValue = 3;
 
+    static int playerHealth = 100;
+
     static int[][][] playerInventory = {
             { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2 },
@@ -287,6 +289,10 @@ public class ArrayGame {
 
         boolean fighting = true;
         while (fighting == true) {
+            for (int enemyHealthDisplay = 0; enemyHealthDisplay < enemyHealth.length; enemyHealthDisplay++) {
+                prnSlow("Enemy " + (enemyHealthDisplay + 1) + " has " + enemyHealth[enemyHealthDisplay] + " health points");
+            }
+            prnSlow("You have " + playerHealth + " health points");
             // Display battle options
             String[] battleOptions = { "Sword strike", "Bow shot", "Inventory" };
             for (int i = 0; i < battleOptions.length; i++) {
@@ -297,11 +303,13 @@ public class ArrayGame {
             if (selection == 1) {
                 attacks("sword", enemies);
                 clear();
-                enemyHealth[0] -= playerInventory[0][0][1];
+                enemyHealth[0] -= playerInventory[0][1][1];
             } else if (selection == 2) {
                 attacks("bow", enemies);
                 clear();
-                enemyHealth[0] -= playerInventory[0][1][1] * playerInventory[0][2][1];
+                for (int j = 0; j < enemies; j++) {
+                    enemyHealth[j] -= playerInventory[0][3][1] * playerInventory[0][5][1];
+                }
             } else {
                 inventory();
             }
@@ -397,8 +405,7 @@ public class ArrayGame {
     public static void inventory() throws InterruptedException {
         // TODO
         // Create inventory array (3 dimentional)
-        // First dimention: type/catagory
-        // 1: Weapons, 2: Heals, 3: items
+        // First dimention: type/catagory (0: Weapons, 1: Heals)
         // Second dimention: row
         // Third dimention: collumn
         // Player should be able to organise their inventory (swap)
@@ -446,8 +453,10 @@ public class ArrayGame {
     }
 
     public static void swap(String[] swapNums, int catagory) throws InterruptedException {
+        // Variables to store coordinates of the item and the item number value
         int[][] itemLoc = { { 0, 0 }, { 0, 0 } };
         int[] item = { 0, 0 };
+        // Convert the box number the player will read to the actual coordinate
         for (int i = 1; i < swapNums.length; i++) {
             if (swapNums[i].equals("1") || swapNums[i].equalsIgnoreCase("one")) {
                 itemLoc[i - 1][0] = 1;
@@ -487,6 +496,7 @@ public class ArrayGame {
                 itemLoc[i - 1][1] = 7;
             }
         }
+        // Swap the items
         item[0] = playerInventory[catagory][itemLoc[0][0]][itemLoc[0][1]];
         item[1] = playerInventory[catagory][itemLoc[1][0]][itemLoc[1][1]];
 
@@ -548,6 +558,7 @@ public class ArrayGame {
                     }
                 } else {
                     // Heals
+                    // Number represents how much it heals the player by
                     if (playerInventory[catagory][i][j] == 10) {
                         // Print small heal
                         prt(" . ");
