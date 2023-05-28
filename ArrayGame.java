@@ -12,14 +12,18 @@ public class ArrayGame {
     static int enemyValue = 3;
 
     static int[][][] playerInventory = {
-            { { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
-                    { -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
-                    { -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
-                    { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0 } },
-            { { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
-                    { -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
-                    { -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2, 0, -2 },
-                    { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0 } } };
+            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2 },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 0, -2, 0, -2, 0, -2 },
+                    { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
+            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
+
+    static int page = 0;
+    static int inventoryRowSlots = 3;
+    static int inventoryColmSlots = 4;
 
     // static String[] arrowType = {"Stone tipped arrow", "Metal tipped arrow",
     // "Explosive tipped arrow"};
@@ -292,13 +296,13 @@ public class ArrayGame {
             if (selection == 1) {
                 attacks("sword", enemies);
                 clear();
-                String sword = inventory("weapons", "sword");
+                damage = playerInventory[0][0][0];
             } else if (selection == 2) {
                 attacks("bow", enemies);
                 clear();
-                String sword = inventory("weapons", "sword");
+                damage = playerInventory[0][1][0] * playerInventory[0][2][0];
             } else {
-                displayInventory();
+                inventory();
             }
 
         }
@@ -377,7 +381,7 @@ public class ArrayGame {
         }
     }
 
-    public static void inventory() {
+    public static void inventory() throws InterruptedException {
         // TODO
         // Create inventory array (3 dimentional)
         // First dimention: type/catagory
@@ -391,10 +395,82 @@ public class ArrayGame {
         // Items in use (sword, bow, etc.) will be in special slots
         // Colours indicate what items are better
 
+        boolean looking = true;
+        while (looking) {
+            clear();
+            prnSlow("Page " + (page + 1) + " of 2");
+            printInventory(page);
+            prn("\nValid commands (non case sensitive, must be separated by spaces):\n- Swap (spot 1) (spot 2)\n- Flip page\n- Close");
+            String[] command = (input.nextLine()).split(" ");
+
+            if (command[0].equalsIgnoreCase("swap")) {
+                // Swap
+                swap(command, page);
+            } else if (command[0].equalsIgnoreCase("flip")) {
+                // flip page
+                if (page == 1) {
+                    page = 0;
+                } else {
+                    page = 1;
+                }
+            } else if (command[0].equalsIgnoreCase("close")) {
+                // Close inventory menu
+                looking = false;
+            }
+        }
+        clear();
+    }
+
+    public static void swap(String[] swapNums, int catagory) {
+        int[][] itemLoc = { { 0, 0 }, { 0, 0 } };
+        int[] item = { 0, 0 };
+        for (int i = 1; i < swapNums.length; i++) {
+            if (swapNums[i].equals("1") || swapNums[i].equalsIgnoreCase("one")) {
+                itemLoc[i - 1][0] = 1;
+                itemLoc[i - 1][1] = 1;
+            } else if (swapNums[i].equals("2") || swapNums[i].equalsIgnoreCase("two")) {
+                itemLoc[i - 1][0] = 1;
+                itemLoc[i - 1][1] = 3;
+            } else if (swapNums[i].equals("3") || swapNums[i].equalsIgnoreCase("three")) {
+                itemLoc[i - 1][0] = 1;
+                itemLoc[i - 1][1] = 5;
+            } else if (swapNums[i].equals("4") || swapNums[i].equalsIgnoreCase("four")) {
+                itemLoc[i - 1][0] = 1;
+                itemLoc[i - 1][1] = 7;
+            } else if (swapNums[i].equals("5") || swapNums[i].equalsIgnoreCase("five")) {
+                itemLoc[i - 1][0] = 3;
+                itemLoc[i - 1][1] = 1;
+            } else if (swapNums[i].equals("6") || swapNums[i].equalsIgnoreCase("six")) {
+                itemLoc[i - 1][0] = 3;
+                itemLoc[i - 1][1] = 3;
+            } else if (swapNums[i].equals("7") || swapNums[i].equalsIgnoreCase("seven")) {
+                itemLoc[i - 1][0] = 3;
+                itemLoc[i - 1][1] = 5;
+            } else if (swapNums[i].equals("8") || swapNums[i].equalsIgnoreCase("eight")) {
+                itemLoc[i - 1][0] = 3;
+                itemLoc[i - 1][1] = 7;
+            } else if (swapNums[i].equals("9") || swapNums[i].equalsIgnoreCase("nine")) {
+                itemLoc[i - 1][0] = 5;
+                itemLoc[i - 1][1] = 1;
+            } else if (swapNums[i].equals("10") || swapNums[i].equalsIgnoreCase("ten")) {
+                itemLoc[i - 1][0] = 5;
+                itemLoc[i - 1][1] = 3;
+            } else if (swapNums[i].equals("11") || swapNums[i].equalsIgnoreCase("eleven")) {
+                itemLoc[i - 1][0] = 5;
+                itemLoc[i - 1][1] = 5;
+            } else if (swapNums[i].equals("12") || swapNums[i].equalsIgnoreCase("twelve")) {
+                itemLoc[i - 1][0] = 5;
+                itemLoc[i - 1][1] = 7;
+            }
+        }
+        item[0] = playerInventory[catagory][itemLoc[0][0]][itemLoc[0][1]];
+        item[1] = playerInventory[catagory][itemLoc[1][0]][itemLoc[1][1]];
+
+        playerInventory[catagory][itemLoc[0][0]][itemLoc[0][1]] = item[1];
+        playerInventory[catagory][itemLoc[1][0]][itemLoc[1][1]] = item[0];
     }
 
     public static void printInventory(int catagory) {
-        clear();
         for (int i = 0; i < playerInventory[0].length; i++) {
             for (int j = 0; j < playerInventory[0][0].length; j++) {
                 if (playerInventory[catagory][i][j] == 0) {
@@ -432,7 +508,7 @@ public class ArrayGame {
                     } else if (playerInventory[catagory][i][j] == 30) {
                         // Print large heal
                         prt("(_)");
-                    } else {
+                    } else if (playerInventory[catagory][i][j] == 5) {
                         // Print suspiciuos heal
                         // Using this item may make the user lose health
                         prt("_'-");
