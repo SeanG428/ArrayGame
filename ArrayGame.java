@@ -25,6 +25,8 @@ public class ArrayGame {
     static int inventoryRowSlots = 3;
     static int inventoryColmSlots = 4;
 
+    static boolean canClose = true;
+
     // static String[] arrowType = {"Stone tipped arrow", "Metal tipped arrow",
     // "Explosive tipped arrow"};
 
@@ -400,7 +402,13 @@ public class ArrayGame {
             clear();
             prnSlow("Page " + (page + 1) + " of 2");
             printInventory(page);
-            prn("\nValid commands (non case sensitive, must be separated by spaces):\n- Swap (spot 1) (spot 2)\n- Flip page\n- Close");
+            prn("\nValid commands (non case sensitive, must be separated by spaces):");
+            prn("- Swap (slot 1) (slot 2)");
+            prn("- Flip page");
+            if (page == 1) {
+                prn("- Use item (slot)");
+            }
+            prn("- Close");
             String[] command = (input.nextLine()).split(" ");
 
             if (command[0].equalsIgnoreCase("swap")) {
@@ -413,15 +421,20 @@ public class ArrayGame {
                 } else {
                     page = 1;
                 }
-            } else if (command[0].equalsIgnoreCase("close")) {
+            } else if (command[0].equalsIgnoreCase("flip") && page == 1) {
+                // Use item
+            } else if (command[0].equalsIgnoreCase("close") && canClose == true) {
                 // Close inventory menu
                 looking = false;
+            } else {
+                prnSlow("You may not close the inventory unless all items are in the correct slots.");
+                Thread.sleep(1000);
             }
         }
         clear();
     }
 
-    public static void swap(String[] swapNums, int catagory) {
+    public static void swap(String[] swapNums, int catagory) throws InterruptedException {
         int[][] itemLoc = { { 0, 0 }, { 0, 0 } };
         int[] item = { 0, 0 };
         for (int i = 1; i < swapNums.length; i++) {
@@ -468,6 +481,13 @@ public class ArrayGame {
 
         playerInventory[catagory][itemLoc[0][0]][itemLoc[0][1]] = item[1];
         playerInventory[catagory][itemLoc[1][0]][itemLoc[1][1]] = item[0];
+
+        boolean inOrder = weaponSlotCheck();
+        if (!inOrder) {
+            canClose = false;
+        } else {
+            canClose = true;
+        }
     }
 
     public static void printInventory(int catagory) {
@@ -517,6 +537,26 @@ public class ArrayGame {
             }
             prn("");
         }
+    }
+
+    public static boolean weaponSlotCheck() throws InterruptedException {
+        boolean properSlot = true;
+        if (playerInventory[0][1][1] != 20 && playerInventory[0][1][1] != 30 && playerInventory[0][1][1] != 50) {
+            prnSlow("(Please put sword back in proper slot)");
+            Thread.sleep(1000);
+            properSlot = false;
+        }
+        if (playerInventory[0][3][1] != 1 && playerInventory[0][3][1] != 2) {
+            prnSlow("(Please put bow back in proper slot)");
+            Thread.sleep(1000);
+            properSlot = false;
+        }
+        if (playerInventory[0][5][1] != 10 && playerInventory[0][5][1] != 15 && playerInventory[0][5][1] != 25) {
+            prnSlow("(Please put arrow back in proper slot)");
+            Thread.sleep(1000);
+            properSlot = false;
+        }
+        return properSlot;
     }
 
     public static int[][] arrayImages(String name) {
