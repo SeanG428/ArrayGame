@@ -548,7 +548,7 @@ public class ArrayGame {
         while (looking) {
             clear();
             prnSlow("Page " + (page + 1) + " of 2");
-            printInventory(page);
+            printInventoryAndShop(playerInventory, page);
             prn("\nValid commands (non case sensitive, must be separated by spaces):");
             prn("- Swap (slot 1) (slot 2)");
             prn("- Flip page");
@@ -583,47 +583,12 @@ public class ArrayGame {
 
     public static void swap(String[] swapNums, int catagory) throws InterruptedException {
         // Variables to store coordinates of the item and the item number value
-        int[][] itemLoc = { { 0, 0 }, { 0, 0 } };
+        int[][] itemLoc = new int[2][2];
         int[] item = { 0, 0 };
         // Convert the box number the player will read to the actual coordinate
-        for (int i = 1; i < swapNums.length; i++) {
-            if (swapNums[i].equals("1") || swapNums[i].equalsIgnoreCase("one")) {
-                itemLoc[i - 1][0] = 1;
-                itemLoc[i - 1][1] = 1;
-            } else if (swapNums[i].equals("2") || swapNums[i].equalsIgnoreCase("two")) {
-                itemLoc[i - 1][0] = 1;
-                itemLoc[i - 1][1] = 3;
-            } else if (swapNums[i].equals("3") || swapNums[i].equalsIgnoreCase("three")) {
-                itemLoc[i - 1][0] = 1;
-                itemLoc[i - 1][1] = 5;
-            } else if (swapNums[i].equals("4") || swapNums[i].equalsIgnoreCase("four")) {
-                itemLoc[i - 1][0] = 1;
-                itemLoc[i - 1][1] = 7;
-            } else if (swapNums[i].equals("5") || swapNums[i].equalsIgnoreCase("five")) {
-                itemLoc[i - 1][0] = 3;
-                itemLoc[i - 1][1] = 1;
-            } else if (swapNums[i].equals("6") || swapNums[i].equalsIgnoreCase("six")) {
-                itemLoc[i - 1][0] = 3;
-                itemLoc[i - 1][1] = 3;
-            } else if (swapNums[i].equals("7") || swapNums[i].equalsIgnoreCase("seven")) {
-                itemLoc[i - 1][0] = 3;
-                itemLoc[i - 1][1] = 5;
-            } else if (swapNums[i].equals("8") || swapNums[i].equalsIgnoreCase("eight")) {
-                itemLoc[i - 1][0] = 3;
-                itemLoc[i - 1][1] = 7;
-            } else if (swapNums[i].equals("9") || swapNums[i].equalsIgnoreCase("nine")) {
-                itemLoc[i - 1][0] = 5;
-                itemLoc[i - 1][1] = 1;
-            } else if (swapNums[i].equals("10") || swapNums[i].equalsIgnoreCase("ten")) {
-                itemLoc[i - 1][0] = 5;
-                itemLoc[i - 1][1] = 3;
-            } else if (swapNums[i].equals("11") || swapNums[i].equalsIgnoreCase("eleven")) {
-                itemLoc[i - 1][0] = 5;
-                itemLoc[i - 1][1] = 5;
-            } else if (swapNums[i].equals("12") || swapNums[i].equalsIgnoreCase("twelve")) {
-                itemLoc[i - 1][0] = 5;
-                itemLoc[i - 1][1] = 7;
-            }
+
+        for (int i = 0; i < itemLoc.length; i++) {
+            itemLoc[i] = playerVisualToArrayLocs(swapNums[i + 1], i);
         }
         // Swap the items
         item[0] = playerInventory[catagory][itemLoc[0][0]][itemLoc[0][1]];
@@ -640,7 +605,49 @@ public class ArrayGame {
         }
     }
 
-    public static void printInventoryAndShop(int catagory) {
+    public static int[] playerVisualToArrayLocs(String num, int index) {
+        int[] itemLoc = new int[2];
+        if (num.equals("1") || num.equalsIgnoreCase("one")) {
+            itemLoc[0] = 1;
+            itemLoc[1] = 1;
+        } else if (num.equals("2") || num.equalsIgnoreCase("two")) {
+            itemLoc[0] = 1;
+            itemLoc[1] = 3;
+        } else if (num.equals("3") || num.equalsIgnoreCase("three")) {
+            itemLoc[0] = 1;
+            itemLoc[1] = 5;
+        } else if (num.equals("4") || num.equalsIgnoreCase("four")) {
+            itemLoc[0] = 1;
+            itemLoc[1] = 7;
+        } else if (num.equals("5") || num.equalsIgnoreCase("five")) {
+            itemLoc[0] = 3;
+            itemLoc[1] = 1;
+        } else if (num.equals("6") || num.equalsIgnoreCase("six")) {
+            itemLoc[0] = 3;
+            itemLoc[1] = 3;
+        } else if (num.equals("7") || num.equalsIgnoreCase("seven")) {
+            itemLoc[0] = 3;
+            itemLoc[1] = 5;
+        } else if (num.equals("8") || num.equalsIgnoreCase("eight")) {
+            itemLoc[0] = 3;
+            itemLoc[1] = 7;
+        } else if (num.equals("9") || num.equalsIgnoreCase("nine")) {
+            itemLoc[0] = 5;
+            itemLoc[1] = 1;
+        } else if (num.equals("10") || num.equalsIgnoreCase("ten")) {
+            itemLoc[0] = 5;
+            itemLoc[1] = 3;
+        } else if (num.equals("11") || num.equalsIgnoreCase("eleven")) {
+            itemLoc[0] = 5;
+            itemLoc[1] = 5;
+        } else if (num.equals("12") || num.equalsIgnoreCase("twelve")) {
+            itemLoc[0] = 5;
+            itemLoc[1] = 7;
+        }
+        return itemLoc;
+    }
+
+    public static void printInventoryAndShop(int[][][] array, int catagory) {
         // TODO
         // Add colours
         for (int i = 0; i < playerInventory[0].length; i++) {
@@ -728,6 +735,48 @@ public class ArrayGame {
             properSlot = false;
         }
         return properSlot;
+    }
+
+    public static void shop() {
+        // TODO
+        // Create shop
+        clear();
+        int[][][] shopItems = {
+                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 30, -2, 50, -2, 0, -2, 0, -2, },
+                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 2, -2, 0, -2, 0, -2, 0, -2 },
+                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 15, -2, 25, -2, 0, -2 },
+                        { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
+                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 10, -2, 20, -2, 30, -2, 0, -2 },
+                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                        { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
+
+        boolean done = false;
+        while (!done) {
+            printInventoryAndShop(shopItems, page);
+
+            prnSlow("What would you like to buy? (non-case sensitive)");
+            prnSlow("- Flip page");
+            prnSlow("- Buy (slot)");
+            prnSlow("- Close");
+
+            String[] selection = (input.nextLine()).split(" ");
+
+            if (selection[0].equalsIgnoreCase("flip")) {
+                if (page == 0) {
+                    page = 1;
+                } else {
+                    page = 0;
+                }
+            } else if (selection[0].equalsIgnoreCase("buy")) {
+                buy(selection);
+            } else if (selection[0].equalsIgnoreCase("close")) {
+                done = true;
+            }
+        }
+    }
+
+    public static void buy(String[] in) {
     }
 
     public static int[][] arrayImages(String name) {
