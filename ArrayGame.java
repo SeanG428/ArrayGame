@@ -262,9 +262,6 @@ public class ArrayGame {
 
         boolean fighting = true;
         while (fighting == true) {
-            // TODO
-            // Print fight graphics
-
             // Display battle options
             String[] battleOptions = { "Sword strike", "Bow shot", "Inventory" };
             for (int i = 0; i < battleOptions.length; i++) {
@@ -272,17 +269,20 @@ public class ArrayGame {
             }
             int selection = Integer.parseInt(input.nextLine());
 
+            int damage = 0;
             if (selection == 1) {
-                attacks("sword");
+                attacks("sword", enemies);
             } else if (selection == 2) {
-                attacks("bow");
+                attacks("bow", enemies);
             } else {
                 // inventory();
             }
+            clear();
+
         }
     }
 
-    public static void attacks(String attackType) throws InterruptedException {
+    public static void attacks(String attackType, int numOfEnemies) throws InterruptedException {
         String[] enemy = { "<(&)>___  ", "  | (*  );", "   |   \\|  ", "  %==<^)  ", "  |   ((  ",
                 "       \\\\ ", "       // " };
         String[] playerWithSword = { "_-^-_  ", "(  *) /", " ||  /", " |^=%  ", " ))    ",
@@ -296,7 +296,7 @@ public class ArrayGame {
             int spaceBack = 0;
             for (int i = 20; i > 0; i--) {
                 clear();
-                printSwordAttack(playerWithSword, enemy, i, spaceBack);
+                printSwordAttack(playerWithSword, enemy, i, spaceBack, numOfEnemies);
                 Thread.sleep(80);
                 spaceBack++;
             }
@@ -305,31 +305,34 @@ public class ArrayGame {
             int distance = 40;
             for (int i = distance; i > 0; i--) {
                 clear();
-                printBowAttack(playerWithBow, enemy, arrow, distance, i, spaceBack);
+                printBowAttack(playerWithBow, enemy, arrow, distance, i, spaceBack, numOfEnemies);
                 Thread.sleep(80);
                 spaceBack++;
             }
         }
     }
 
-    public static void printSwordAttack(String player[], String[] enemy, int spaceFront, int spaceBack) {
+    public static void printSwordAttack(String player[], String[] enemy, int spaceFront, int spaceBack, int numOfEnemies) {
         for (int i = 0; i < player.length; i++) {
-            for (int k = 0; k < spaceBack; k++) {
+            for (int j = 0; j < spaceBack; j++) {
                 prt(" ");
             }
             prt(player[i]);
-            for (int l = 0; l < spaceFront; l++) {
+            for (int k = 0; k < spaceFront; k++) {
                 prt(" ");
             }
-            prn(enemy[i]);
+            for (int l = 0; l < numOfEnemies; l++) {
+                prt(enemy[i]);
+            }
+            prn("");
         }
     }
 
-    public static void printBowAttack(String player[], String[] enemy, String arrow, int distance, int spaceFront, int spaceBack) {
+    public static void printBowAttack(String player[], String[] enemy, String arrow, int distance, int spaceFront, int spaceBack, int numOfEnemies) {
         for (int i = 0; i < player.length; i++) {
             prt(player[i]);
             if (i == player.length / 2) {
-                for (int k = 0; k < spaceBack && k < distance - arrow.length(); k++) {
+                for (int j = 0; j < spaceBack && j < distance - arrow.length(); j++) {
                     prt(" ");
                 }
                 prt(arrow);
@@ -343,7 +346,10 @@ public class ArrayGame {
                     prt(" ");
                 }
             }
-            prn(enemy[i]);
+            for (int m = 0; m < numOfEnemies; m++) {
+                prt(enemy[i]);
+            }
+            prn("");
         }
     }
 
@@ -369,12 +375,6 @@ public class ArrayGame {
         } else if (name.equals("healersLodge")) {
             int[][] healersLodge = {};
             return healersLodge;
-        } else if (name.equals("house1")) {
-            int[][] house1 = {};
-            return house1;
-        } else if (name.equals("house2")) {
-            int[][] house2 = {};
-            return house2;
         } else if (name.equals("dungeonStart")) {
             int[][] start = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 5 },
