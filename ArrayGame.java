@@ -11,7 +11,9 @@ public class ArrayGame {
     static int playerValue = 2;
     static int enemyValue = 3;
 
-    public static void main(String[] args) {
+    // static String[] arrowType = {"Normal", "Fire", "Poison", "Explosive"};
+
+    public static void main(String[] args) throws Exception {
         // PLAN FOR GAME:
         // Turn based game
         // 15x15 board with borders (17x17 total)
@@ -40,7 +42,7 @@ public class ArrayGame {
 
             int numOfNearEnemies = checkForEnemies(board);
             if (numOfNearEnemies > 0) {
-                battle(numOfNearEnemies);
+                battle(board, numOfNearEnemies);
             }
 
             clear();
@@ -52,8 +54,12 @@ public class ArrayGame {
         System.out.print("\033[H\033[2J");
     }
 
-    public static void prns(String text) {
-
+    public static void prnSlow(String text) throws InterruptedException {
+        for (int i = 0; i < text.length(); i++) {
+            System.out.print(text.charAt(i));
+            Thread.sleep(20);
+        }
+        System.out.println("\n");
     }
 
     public static void prn(String text) {
@@ -186,9 +192,9 @@ public class ArrayGame {
         int[][] enemyLocs = enemyLocations(map, enemies);
 
         // Check enemy coordinates (print)
-        // for (int j = 0; j < enemyLocations.length; j++) {
-        // for (int k = 0; k < enemyLocations[0].length; k++) {
-        // prt(enemyLocations[j][k] + " ");
+        // for (int j = 0; j < enemyLocs.length; j++) {
+        // for (int k = 0; k < enemyLocs[0].length; k++) {
+        // prt(enemyLocs[j][k] + " ");
         // }
         // prn();
         // }
@@ -240,23 +246,105 @@ public class ArrayGame {
         return numOfNearEnemies;
     }
 
-    public static void battle(int enemies) {
+    public static void battle(int[][] map, int enemies) throws InterruptedException {
         // TODO:
         // Create battle mechanics
         // Loop until battle is over
         // Return player to the last place they were
         clear();
         if (enemies > 1) {
-            prn("You've encountered " + enemies + " enemies");
+            prnSlow("You've encountered " + enemies + " enemies");
         } else {
-            prn("You've encountered an enemy");
+            prnSlow("You've encountered an enemy");
         }
-        prn("(Press ENTER)");
+        prnSlow("(Press ENTER)");
         input.nextLine();
 
-        // TODO
-        // Print fight graphics
+        boolean fighting = true;
+        while (fighting == true) {
+            // TODO
+            // Print fight graphics
 
+            // Display battle options
+            String[] battleOptions = { "Sword strike", "Bow shot", "Inventory" };
+            for (int i = 0; i < battleOptions.length; i++) {
+                prnSlow(i + 1 + ") " + battleOptions[i]);
+            }
+            int selection = Integer.parseInt(input.nextLine());
+
+            if (selection == 1) {
+                attacks("sword");
+            } else if (selection == 2) {
+                attacks("bow");
+            } else {
+                // inventory();
+            }
+        }
+    }
+
+    public static void attacks(String attackType) throws InterruptedException {
+        String[] enemy = { "<(&)>___  ", "  | (*  );", "   |   \\|  ", "  %==<^)  ", "  |   ((  ",
+                "       \\\\ ", "       // " };
+        String[] playerWithSword = { "_-^-_  ", "(  *) /", " ||  /", " |^=%  ", " ))    ",
+                " ||    ", " ^-^-  " };
+        String[] playerWithBow = { "_-^-_  ", "(  *)  ", " ||  \\", " |^==% ", " ))  / ",
+                " ||    ", " ^-^-  " };
+
+        String arrow = ">---<>";
+
+        if (attackType.equals("sword")) {
+            int spaceBack = 0;
+            for (int i = 20; i > 0; i--) {
+                clear();
+                printSwordAttack(playerWithSword, enemy, i, spaceBack);
+                Thread.sleep(80);
+                spaceBack++;
+            }
+        } else {
+            int spaceBack = 0;
+            int distance = 40;
+            for (int i = distance; i > 0; i--) {
+                clear();
+                printBowAttack(playerWithBow, enemy, arrow, distance, i, spaceBack);
+                Thread.sleep(80);
+                spaceBack++;
+            }
+        }
+    }
+
+    public static void printSwordAttack(String player[], String[] enemy, int spaceFront, int spaceBack) {
+        for (int i = 0; i < player.length; i++) {
+            for (int k = 0; k < spaceBack; k++) {
+                prt(" ");
+            }
+            prt(player[i]);
+            for (int l = 0; l < spaceFront; l++) {
+                prt(" ");
+            }
+            prn(enemy[i]);
+        }
+    }
+
+    public static void printBowAttack(String player[], String[] enemy, String arrow, int distance, int spaceFront, int spaceBack) {
+        for (int i = 0; i < player.length; i++) {
+            prt(player[i]);
+            if (i == player.length / 2) {
+                for (int k = 0; k < spaceBack && k < distance - arrow.length(); k++) {
+                    prt(" ");
+                }
+                prt(arrow);
+            } else {
+                for (int k = 0; k < distance; k++) {
+                    prt(" ");
+                }
+            }
+            if (i == player.length / 2) {
+                for (int l = 0; l < spaceFront - arrow.length(); l++) {
+                    prt(" ");
+                }
+            }
+            prn(enemy[i]);
+        }
     }
 
     public static void inventory(int[][] inventory) {
@@ -269,6 +357,7 @@ public class ArrayGame {
         // Items can only be swapped with other items in their catagory
         // Player should be able to select items to use
         // Inventory should automatically shift items over when a slot is empty
+        // Items in use (sword, bow, etc.) will be in special slots
     }
 
     public static int[][] arrayImages(String name) {
