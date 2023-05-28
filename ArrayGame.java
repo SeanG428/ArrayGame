@@ -48,8 +48,8 @@ public class ArrayGame {
         // Enemies move after player
 
         boolean done = false;
-        int[][] map = arrayImages("dungeonStart");
-        map[8][8] = playerValue;
+        int[][] map = arrayImages("town");
+        map[10][8] = playerValue;
 
         clear();
         printArray(map, map.length, map[0].length);
@@ -112,8 +112,12 @@ public class ArrayGame {
                     prt("---");
                 } else if (array[i][j] == 5) {
                     prt(" | ");
-                } else {
+                } else if (array[i][j] == 6) {
                     prt(" X ");
+                } else if (array[i][j] == 7) {
+                    prt(" + ");
+                } else if (array[i][j] == 8) {
+                    prt("%%%");
                 }
             }
             prn("");
@@ -308,8 +312,6 @@ public class ArrayGame {
     }
 
     public static void battle(int[][] map, int[][] enemyLocs, int enemies) throws InterruptedException {
-        // TODO:
-        // Create battle mechanics
         // Loop until battle is over
         // Return player to the last place they were
         clear();
@@ -599,6 +601,8 @@ public class ArrayGame {
     }
 
     public static void printInventory(int catagory) {
+        // TODO
+        // Add colours
         for (int i = 0; i < playerInventory[0].length; i++) {
             for (int j = 0; j < playerInventory[0][0].length; j++) {
                 if (playerInventory[catagory][i][j] == 0) {
@@ -690,7 +694,23 @@ public class ArrayGame {
         // TODO
         // Finish the image arrays for the locations
         if (name.equals("town")) {
-            int[][] town = {};
+            int[][] town = {{ 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
+            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+            { 5, 0, 0, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+            { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 0, 0, 5 },
+            { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 0, 0, 5 },
+            { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 4, 5, 5 },
+            { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 6, 5, 5 },
+            { 5, 0, 0, 4, 4, 6, 4, 4, 0, 0, 0, 0, 0, 0, 4, 5, 5 },
+            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+            { 5, 0, 7, 4, 4, 7, 0, 0, 0, 0, 0, 7, 4, 4, 7, 0, 5 },
+            { 5, 0, 5, 8, 8, 5, 0, 0, 0, 0, 0, 5, 8, 8, 5, 0, 5 },
+            { 5, 0, 7, 4, 4, 7, 0, 0, 0, 0, 0, 7, 4, 4, 7, 0, 5 },
+            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+            { 0, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 0 }};
             return town;
         } else if (name.equals("healersLodge")) {
             int[][] healersLodge = {};
