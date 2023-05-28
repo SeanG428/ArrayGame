@@ -4,6 +4,10 @@ import java.util.Scanner;
 
 public class ArrayGame {
     static Scanner input = new Scanner(System.in);
+
+    static int[][] map = arrayImages("town");
+    static String mapName = "town";
+
     static String obstacle = "&";
     static String player = "#";
     static String enemy = "!";
@@ -38,31 +42,25 @@ public class ArrayGame {
         // 15x15 board with borders (17x17 total)
         // Many boards to represent different places
         // Dungeon to explore, town to rest in
-        // Town will include shops, a blacksmith, a healers lodge, and a couple houses
-        // Dungeon will be a visual maze of rooms with a boss at the end
-        // 0 = empty space( ), 1 = obstacle(&), 2 = player(#), 3 = enemy(!),
-        // 4 = top and bottom borders (_), 5 = side borders(|)
-        // 6 = Doors and paths (X)
+        // Town will include shops, a blacksmith, and a healers lodge
         // Use locations to make enemies move towards player
         // Player moves with w, a, s, d, x input
         // Enemies move after player
 
         boolean done = false;
-        int[][] map = arrayImages("town");
+
         map[10][8] = playerValue;
 
         clear();
         printArray(map, map.length, map[0].length);
 
         while (!done) {
-            movePlayer(map, map.length, map[0].length);
+            playerDirection(map, map.length, map[0].length);
 
             enemyDirection(map, map.length, map[0].length);
 
             clear();
             printArray(map, map.length, map[0].length);
-
-            Thread.sleep(500);
 
             int numOfNearEnemies = checkForEnemies(map);
             if (numOfNearEnemies > 0) {
@@ -113,11 +111,15 @@ public class ArrayGame {
                 } else if (array[i][j] == 5) {
                     prt(" | ");
                 } else if (array[i][j] == 6) {
-                    prt(" X ");
+                    prt("%%%");
                 } else if (array[i][j] == 7) {
                     prt(" + ");
                 } else if (array[i][j] == 8) {
-                    prt("%%%");
+                    prt(" X ");
+                } else if (array[i][j] == 9) {
+                    prt(" X ");
+                } else if (array[i][j] == 10) {
+                    prt(" X ");
                 }
             }
             prn("");
@@ -141,30 +143,22 @@ public class ArrayGame {
         return null;
     }
 
-    public static void movePlayer(int[][] map, int rows, int colms) {
+    public static void playerDirection(int[][] map, int rows, int colms) {
         int[] currentPlayerLoc = playerLoc(map);
 
+        // boolean prevents enemies from moving before the player takes their turn
         boolean moved = false;
 
         while (!moved) {
             String direction = input.nextLine();
-
-            if (direction.equalsIgnoreCase("a") && map[currentPlayerLoc[0]][currentPlayerLoc[1] - 1] == 0) {
-                map[currentPlayerLoc[0]][currentPlayerLoc[1] - 1] = playerValue;
-                moved = true;
-                map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
-            } else if (direction.equalsIgnoreCase("w") && map[currentPlayerLoc[0] - 1][currentPlayerLoc[1]] == 0) {
-                map[currentPlayerLoc[0] - 1][currentPlayerLoc[1]] = playerValue;
-                moved = true;
-                map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
-            } else if (direction.equalsIgnoreCase("d") && map[currentPlayerLoc[0]][currentPlayerLoc[1] + 1] == 0) {
-                map[currentPlayerLoc[0]][currentPlayerLoc[1] + 1] = playerValue;
-                moved = true;
-                map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
-            } else if (direction.equalsIgnoreCase("x") && map[currentPlayerLoc[0] + 1][currentPlayerLoc[1]] == 0) {
-                map[currentPlayerLoc[0] + 1][currentPlayerLoc[1]] = playerValue;
-                moved = true;
-                map[currentPlayerLoc[0]][currentPlayerLoc[1]] = 0;
+            if (direction.equalsIgnoreCase("a")) {
+                moved = playerMove(map, currentPlayerLoc[0], currentPlayerLoc[1], 0, -1);
+            } else if (direction.equalsIgnoreCase("w")) {
+                moved = playerMove(map, currentPlayerLoc[0], currentPlayerLoc[1], -1, 0);
+            } else if (direction.equalsIgnoreCase("d")) {
+                moved = playerMove(map, currentPlayerLoc[0], currentPlayerLoc[1], 0, 1);
+            } else if (direction.equalsIgnoreCase("x")) {
+                moved = playerMove(map, currentPlayerLoc[0], currentPlayerLoc[1], 1, 0);
             } else if (direction.equalsIgnoreCase("s")) {
                 moved = true;
             } else if (direction.equalsIgnoreCase("i")) {
@@ -173,11 +167,56 @@ public class ArrayGame {
         }
     }
 
-    public static void doors(String roomName, int[][] location) {
+    public static boolean playerMove(int[][] map, int row, int colm, int rowChange, int colmChange) {
+        // Check if movement is possible
+        if (map[row + rowChange][colm + colmChange] == 0) {
+            // Initiate movement
+            map[row + rowChange][colm + colmChange] = playerValue;
+            map[row][colm] = 0;
+
+            return true;
+        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("town")) {
+            map = arrayImages("healersLodge");
+        } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("town")) {
+            map = arrayImages("blackSmith");
+        } else if (map[row + rowChange][colm + colmChange] == 10 && mapName.equals("town")) {
+            map = arrayImages("dungeonStart");
+        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonStart")) {
+            map = arrayImages("town");
+        } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("dungeonStart")) {
+            map = arrayImages("dungeonMiddle");
+        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonMiddle")) {
+            map = arrayImages("dungeonStart");
+        } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("dungeonMiddle")) {
+            map = arrayImages("dungeonEnd");
+        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonEnd")) {
+            map = arrayImages("dungeonMiddle");
+        }
+        return false;
+    }
+
+    public static void doors() {
         // TODO
         // Create method that sends the player to the proper room
         // Base the decision on the current room and the location of the player
         // (eg. "Town, row #, collumn #")
+
+        if (mapName.equals("town")) {
+            int[] currentLoc = playerLoc(arrayImages("town"));
+            if (currentLoc[0] == 7 && currentLoc[1] == 5) {
+                map = arrayImages("town");
+            } else if (currentLoc[0] == 17 && currentLoc[1] == 9) {
+                map = arrayImages("dungeonStart");
+            }
+        } else if (mapName.equals("healersLodge")) {
+
+        } else if (mapName.equals("dungeonStart")) {
+
+        } else if (mapName.equals("dungeonMiddle")) {
+
+        } else if (mapName.equals("dungeonEnd")) {
+
+        }
     }
 
     public static int numOfEnemies(int[][] map) {
@@ -694,23 +733,23 @@ public class ArrayGame {
         // TODO
         // Finish the image arrays for the locations
         if (name.equals("town")) {
-            int[][] town = {{ 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
-            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-            { 5, 0, 0, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-            { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 0, 0, 5 },
-            { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 0, 0, 5 },
-            { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 4, 5, 5 },
-            { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 6, 5, 5 },
-            { 5, 0, 0, 4, 4, 6, 4, 4, 0, 0, 0, 0, 0, 0, 4, 5, 5 },
-            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-            { 5, 0, 7, 4, 4, 7, 0, 0, 0, 0, 0, 7, 4, 4, 7, 0, 5 },
-            { 5, 0, 5, 8, 8, 5, 0, 0, 0, 0, 0, 5, 8, 8, 5, 0, 5 },
-            { 5, 0, 7, 4, 4, 7, 0, 0, 0, 0, 0, 7, 4, 4, 7, 0, 5 },
-            { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-            { 0, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 0 }};
+            int[][] town = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 4, 5, 5 },
+                    { 5, 0, 5, 7, 7, 7, 7, 7, 5, 0, 0, 0, 0, 0, 9, 5, 5 },
+                    { 5, 0, 0, 4, 4, 8, 4, 4, 0, 0, 0, 0, 0, 0, 4, 5, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 7, 4, 4, 7, 0, 0, 0, 0, 0, 7, 4, 4, 7, 0, 5 },
+                    { 5, 0, 5, 6, 6, 5, 0, 0, 0, 0, 0, 5, 6, 6, 5, 0, 5 },
+                    { 5, 0, 7, 4, 4, 7, 0, 0, 0, 0, 0, 7, 4, 4, 7, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 0, 4, 4, 4, 4, 4, 4, 4, 10, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return town;
         } else if (name.equals("healersLodge")) {
             int[][] healersLodge = {};
