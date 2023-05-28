@@ -181,79 +181,43 @@ public class ArrayGame {
     public static boolean playerMove(int[][] map, int row, int colm, int rowChange, int colmChange) {
         // Check if movement is possible
         // If the player is moving into a door, send them to the designated location
-        
+
         if (map[row + rowChange][colm + colmChange] == 0) {
             // Initiate movement
             map[row + rowChange][colm + colmChange] = playerValue;
             map[row][colm] = 0;
+        } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("town")) {
+            shop();
         } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("town")) {
-            mapName = "healersLodge";
-            for (int i = 0; i < map.length; i++) {
-                for (int j = 0; j < map[0].length; j++) {
-                    map[i][j] = arrayImages(mapName)[i][j];
-                }
-            }
-            map[15][8] = playerValue;
+            doors("healersLodge", 15, 8);
         } else if (map[row + rowChange][colm + colmChange] == 10 && mapName.equals("town")) {
-            mapName = "dungeonStart";
-            for (int i = 0; i < map.length; i++) {
-                for (int j = 0; j < map[0].length; j++) {
-                    map[i][j] = arrayImages(mapName)[i][j];
-                }
-            }
-            map[8][15] = playerValue;
+            doors("dungeonStart", 8, 15);
         } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("healersLodge")) {
-            mapName = "town";
-            for (int i = 0; i < map.length; i++) {
-                for (int j = 0; j < map[0].length; j++) {
-                    map[i][j] = arrayImages(mapName)[i][j];
-                }
-            }
-            map[8][5] = playerValue;
+            doors("town", 8, 5);
         } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonStart")) {
-            mapName = "town";
-            for (int i = 0; i < map.length; i++) {
-                for (int j = 0; j < map[0].length; j++) {
-                    map[i][j] = arrayImages(mapName)[i][j];
-                }
-            }
-            map[15][8] = playerValue;
+            doors("town", 15, 8);
         } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("dungeonStart")) {
-            mapName = "dungeonMiddle";
-            for (int i = 0; i < map.length; i++) {
-                for (int j = 0; j < map[0].length; j++) {
-                    map[i][j] = arrayImages(mapName)[i][j];
-                }
-            }
-            map[13][15] = playerValue;
+            doors("dungeonMiddle", 13, 15);
         } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonMiddle")) {
-            mapName = "dungeonStart";
-            for (int i = 0; i < map.length; i++) {
-                for (int j = 0; j < map[0].length; j++) {
-                    map[i][j] = arrayImages(mapName)[i][j];
-                }
-            }
-            map[13][1] = playerValue;
+            doors("dungeonStart", 13, 1);
         } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("dungeonMiddle")) {
-            mapName = "dungeonEnd";
-            for (int i = 0; i < map.length; i++) {
-                for (int j = 0; j < map[0].length; j++) {
-                    map[i][j] = arrayImages(mapName)[i][j];
-                }
-            }
-            map[15][8] = playerValue;
+            doors("dungeonEnd", 15, 8);
         } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonEnd")) {
-            mapName = "dungeonMiddle";
-            for (int i = 0; i < map.length; i++) {
-                for (int j = 0; j < map[0].length; j++) {
-                    map[i][j] = arrayImages(mapName)[i][j];
-                }
-            }
-            map[1][9] = playerValue;
+            doors("dungeonMiddle", 1, 9);
         } else {
             return false;
         }
         return true;
+    }
+
+    public static void doors(String locName, int transportRow, int transportColm) {
+        mapName = locName;
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                map[i][j] = arrayImages(mapName)[i][j];
+            }
+        }
+        map[transportRow][transportColm] = playerValue;
     }
 
     public static int numOfEnemies(int[][] map) {
@@ -676,7 +640,7 @@ public class ArrayGame {
         }
     }
 
-    public static void printInventory(int catagory) {
+    public static void printInventoryAndShop(int catagory) {
         // TODO
         // Add colours
         for (int i = 0; i < playerInventory[0].length; i++) {
