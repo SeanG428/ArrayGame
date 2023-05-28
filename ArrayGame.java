@@ -294,19 +294,30 @@ public class ArrayGame {
             }
             int selection = Integer.parseInt(input.nextLine());
 
-            int damage = 0;
             if (selection == 1) {
                 attacks("sword", enemies);
                 clear();
-                damage = playerInventory[0][0][0];
+                enemyHealth[0] -= playerInventory[0][0][0];
             } else if (selection == 2) {
                 attacks("bow", enemies);
                 clear();
-                damage = playerInventory[0][1][0] * playerInventory[0][2][0];
+                enemyHealth[0] -= playerInventory[0][1][0] * playerInventory[0][2][0];
             } else {
                 inventory();
             }
 
+            // Check is there are any enemies left
+            int aliveEnemies = 0;
+            for (int i = 0; i < enemies; i++) {
+                if (enemyHealth[i] > 0) {
+                    aliveEnemies++;
+                }
+            }
+            enemies = aliveEnemies;
+            // End fight if there are no enemies
+            if (aliveEnemies == 0) {
+                fighting = false;
+            }
         }
     }
 
