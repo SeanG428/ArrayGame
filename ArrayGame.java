@@ -48,24 +48,28 @@ public class ArrayGame {
         // Enemies move after player
 
         boolean done = false;
-        int[][] board = arrayImages("dungeonStart");
-        board[8][8] = playerValue;
+        int[][] map = arrayImages("dungeonStart");
+        map[8][8] = playerValue;
 
         clear();
-        printArray(board, board.length, board[0].length);
+        printArray(map, map.length, map[0].length);
 
         while (!done) {
-            movePlayer(board, board.length, board[0].length);
+            movePlayer(map, map.length, map[0].length);
 
-            enemyDirection(board, board.length, board[0].length);
-
-            int numOfNearEnemies = checkForEnemies(board);
-            if (numOfNearEnemies > 0) {
-                battle(board, numOfNearEnemies);
-            }
+            enemyDirection(map, map.length, map[0].length);
 
             clear();
-            printArray(board, board.length, board[0].length);
+            printArray(map, map.length, map[0].length);
+
+            Thread.sleep(500);
+
+            int numOfNearEnemies = checkForEnemies(map);
+            if (numOfNearEnemies > 0) {
+                battle(map, nearEnemyLocations(map, numOfNearEnemies), numOfNearEnemies);
+                clear();
+                printArray(map, map.length, map[0].length);
+            }
         }
     }
 
@@ -85,9 +89,9 @@ public class ArrayGame {
         System.out.println(text);
     }
 
-    public static void prn(int text) {
-        System.out.println(text);
-    }
+    // public static void prn(int text) {
+    // System.out.println(text);
+    // }
 
     public static void prt(String text) {
         System.out.print(text);
@@ -267,7 +271,39 @@ public class ArrayGame {
         return numOfNearEnemies;
     }
 
-    public static void battle(int[][] map, int enemies) throws InterruptedException {
+    public static int[][] nearEnemyLocations(int[][] map, int numOfNearEnemies) {
+        int[] currentPlayerLoc = playerLoc(map);
+        int enemies = numOfEnemies(map);
+        int[][] enemyLocs = enemyLocations(map, enemies);
+        int[][] nearEnemyLocs = new int[numOfNearEnemies][2];
+
+        for (int slot = 0; slot < numOfNearEnemies; slot++) {
+            int timesSet = 0;
+            for (int i = 0; i < enemies; i++) {
+                if (currentPlayerLoc[0] + 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1] && timesSet <= slot) {
+                    nearEnemyLocs[slot][0] = enemyLocs[i][0];
+                    nearEnemyLocs[slot][1] = enemyLocs[i][1];
+                    timesSet++;
+                } else if (currentPlayerLoc[0] - 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1] && timesSet <= slot) {
+                    nearEnemyLocs[slot][0] = enemyLocs[i][0];
+                    nearEnemyLocs[slot][1] = enemyLocs[i][1];
+                    timesSet++;
+                } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] + 1 == enemyLocs[i][1] && timesSet <= slot) {
+                    nearEnemyLocs[slot][0] = enemyLocs[i][0];
+                    nearEnemyLocs[slot][1] = enemyLocs[i][1];
+                    timesSet++;
+                } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] - 1 == enemyLocs[i][1] && timesSet <= slot) {
+                    nearEnemyLocs[slot][0] = enemyLocs[i][0];
+                    nearEnemyLocs[slot][1] = enemyLocs[i][1];
+                    timesSet++;
+                }
+            }
+        }
+
+        return nearEnemyLocs;
+    }
+
+    public static void battle(int[][] map, int[][] enemyLocs, int enemies) throws InterruptedException {
         // TODO:
         // Create battle mechanics
         // Loop until battle is over
@@ -284,13 +320,14 @@ public class ArrayGame {
         // Set enemy health
         int[] enemyHealth = new int[enemies];
         for (int i = 0; i < enemies; i++) {
-            enemyHealth[i] = 50;
+            enemyHealth[i] = 10;
         }
 
         boolean fighting = true;
         while (fighting == true) {
             for (int enemyHealthDisplay = 0; enemyHealthDisplay < enemyHealth.length; enemyHealthDisplay++) {
-                prnSlow("Enemy " + (enemyHealthDisplay + 1) + " has " + enemyHealth[enemyHealthDisplay] + " health points");
+                prnSlow("Enemy " + (enemyHealthDisplay + 1) + " has " + enemyHealth[enemyHealthDisplay]
+                        + " health points");
             }
             prnSlow("You have " + playerHealth + " health points");
             // Display battle options
@@ -324,13 +361,17 @@ public class ArrayGame {
             enemies = aliveEnemies;
             // End fight if there are no enemies
             if (aliveEnemies == 0) {
+                // Delete defeated enemies from map
+                for (int i = 0; i < enemyLocs.length; i++) {
+                    map[enemyLocs[i][0]][enemyLocs[i][1]] = 0;
+                }
                 fighting = false;
             }
         }
     }
 
     public static void attacks(String attackType, int numOfEnemies) throws InterruptedException {
-        String[] enemy = { "<(&)>___  ", "  | (*  );", "   |   \\|  ", "  %==<^)  ", "  |   ((  ",
+        String[] enemy = { "<(&)>___  ", "  | (*  );", "   |   \\| ", "  %==<^)  ", "  |   ((  ",
                 "       \\\\ ", "       // " };
         String[] playerWithSword = { "_-^-_  ", "(  *) /", " ||  /", " |^=%  ", " ))    ",
                 " ||    ", " ^-^-  " };
@@ -569,7 +610,7 @@ public class ArrayGame {
                         // Print large heal
                         prt("(_)");
                     } else if (playerInventory[catagory][i][j] == 5) {
-                        // Print suspiciuos heal
+                        // Print suspicious heal
                         // Using this item may make the user lose health
                         prt("_'-");
                     }
@@ -612,7 +653,7 @@ public class ArrayGame {
             int[][] start = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 5 },
-                    { 5, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 1, 3, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 5 },
