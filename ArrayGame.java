@@ -297,11 +297,11 @@ public class ArrayGame {
             if (selection == 1) {
                 attacks("sword", enemies);
                 clear();
-                enemyHealth[0] -= playerInventory[0][0][0];
+                enemyHealth[0] -= playerInventory[0][0][1];
             } else if (selection == 2) {
                 attacks("bow", enemies);
                 clear();
-                enemyHealth[0] -= playerInventory[0][1][0] * playerInventory[0][2][0];
+                enemyHealth[0] -= playerInventory[0][1][1] * playerInventory[0][2][1];
             } else {
                 inventory();
             }
