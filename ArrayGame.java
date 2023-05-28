@@ -5,8 +5,8 @@ import java.util.Scanner;
 public class ArrayGame {
     static Scanner input = new Scanner(System.in);
 
-    static int[][] map = arrayImages("town");
-    static String mapName = "town";
+    static int[][] map = arrayImages("dungeonEnd");
+    static String mapName = "dungeonEnd";
 
     static String obstacle = "&";
     static String player = "#";
@@ -14,6 +14,8 @@ public class ArrayGame {
     static int obstacleValue = 1;
     static int playerValue = 2;
     static int enemyValue = 3;
+
+    static int test = 17;
 
     static int playerHealth = 100;
 
@@ -33,8 +35,14 @@ public class ArrayGame {
 
     static boolean canClose = true;
 
-    // static String[] arrowType = {"Stone tipped arrow", "Metal tipped arrow",
-    // "Explosive tipped arrow"};
+    static int gold = 100;
+    static int numOfNormalArrows = 0;
+    static int numOfSharpArrows = 0;
+    static int numOfExplosiveArrows = 0;
+    static int numOfSmallHeals = 0;
+    static int numOfMediumHeals = 0;
+    static int numOfLargeHeals = 0;
+    static int numOfSuspiciousHeals = 0;
 
     public static void main(String[] args) throws Exception {
         // PLAN FOR GAME:
@@ -55,9 +63,10 @@ public class ArrayGame {
         printArray(map, map.length, map[0].length);
 
         while (!done) {
-            playerDirection(map, map.length, map[0].length);
+            playerDirection(map);
 
-            enemyDirection(map, map.length, map[0].length);
+            if (mapName.equals("dungeonStart") || mapName.equals("dungeonMiddle") || mapName.equals("dungeonEnd"))
+                enemyDirection(map, map.length, map[0].length);
 
             clear();
             printArray(map, map.length, map[0].length);
@@ -120,6 +129,8 @@ public class ArrayGame {
                     prt(" X ");
                 } else if (array[i][j] == 10) {
                     prt(" X ");
+                } else if (array[i][j] == 11) {
+                    prt("<!>");
                 }
             }
             prn("");
@@ -143,7 +154,7 @@ public class ArrayGame {
         return null;
     }
 
-    public static void playerDirection(int[][] map, int rows, int colms) {
+    public static void playerDirection(int[][] map) throws InterruptedException {
         int[] currentPlayerLoc = playerLoc(map);
 
         // boolean prevents enemies from moving before the player takes their turn
@@ -162,61 +173,87 @@ public class ArrayGame {
             } else if (direction.equalsIgnoreCase("s")) {
                 moved = true;
             } else if (direction.equalsIgnoreCase("i")) {
-                printInventory(0);
+                inventory();
             }
         }
     }
 
     public static boolean playerMove(int[][] map, int row, int colm, int rowChange, int colmChange) {
         // Check if movement is possible
+        // If the player is moving into a door, send them to the designated location
+        
         if (map[row + rowChange][colm + colmChange] == 0) {
             // Initiate movement
             map[row + rowChange][colm + colmChange] = playerValue;
             map[row][colm] = 0;
-
-            return true;
         } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("town")) {
-            map = arrayImages("healersLodge");
-        } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("town")) {
-            map = arrayImages("blackSmith");
-        } else if (map[row + rowChange][colm + colmChange] == 10 && mapName.equals("town")) {
-            map = arrayImages("dungeonStart");
-        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonStart")) {
-            map = arrayImages("town");
-        } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("dungeonStart")) {
-            map = arrayImages("dungeonMiddle");
-        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonMiddle")) {
-            map = arrayImages("dungeonStart");
-        } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("dungeonMiddle")) {
-            map = arrayImages("dungeonEnd");
-        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonEnd")) {
-            map = arrayImages("dungeonMiddle");
-        }
-        return false;
-    }
-
-    public static void doors() {
-        // TODO
-        // Create method that sends the player to the proper room
-        // Base the decision on the current room and the location of the player
-        // (eg. "Town, row #, collumn #")
-
-        if (mapName.equals("town")) {
-            int[] currentLoc = playerLoc(arrayImages("town"));
-            if (currentLoc[0] == 7 && currentLoc[1] == 5) {
-                map = arrayImages("town");
-            } else if (currentLoc[0] == 17 && currentLoc[1] == 9) {
-                map = arrayImages("dungeonStart");
+            mapName = "healersLodge";
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[0].length; j++) {
+                    map[i][j] = arrayImages(mapName)[i][j];
+                }
             }
-        } else if (mapName.equals("healersLodge")) {
-
-        } else if (mapName.equals("dungeonStart")) {
-
-        } else if (mapName.equals("dungeonMiddle")) {
-
-        } else if (mapName.equals("dungeonEnd")) {
-
+            map[15][8] = playerValue;
+        } else if (map[row + rowChange][colm + colmChange] == 10 && mapName.equals("town")) {
+            mapName = "dungeonStart";
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[0].length; j++) {
+                    map[i][j] = arrayImages(mapName)[i][j];
+                }
+            }
+            map[8][15] = playerValue;
+        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("healersLodge")) {
+            mapName = "town";
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[0].length; j++) {
+                    map[i][j] = arrayImages(mapName)[i][j];
+                }
+            }
+            map[8][5] = playerValue;
+        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonStart")) {
+            mapName = "town";
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[0].length; j++) {
+                    map[i][j] = arrayImages(mapName)[i][j];
+                }
+            }
+            map[15][8] = playerValue;
+        } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("dungeonStart")) {
+            mapName = "dungeonMiddle";
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[0].length; j++) {
+                    map[i][j] = arrayImages(mapName)[i][j];
+                }
+            }
+            map[13][15] = playerValue;
+        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonMiddle")) {
+            mapName = "dungeonStart";
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[0].length; j++) {
+                    map[i][j] = arrayImages(mapName)[i][j];
+                }
+            }
+            map[13][1] = playerValue;
+        } else if (map[row + rowChange][colm + colmChange] == 9 && mapName.equals("dungeonMiddle")) {
+            mapName = "dungeonEnd";
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[0].length; j++) {
+                    map[i][j] = arrayImages(mapName)[i][j];
+                }
+            }
+            map[15][8] = playerValue;
+        } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("dungeonEnd")) {
+            mapName = "dungeonMiddle";
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[0].length; j++) {
+                    map[i][j] = arrayImages(mapName)[i][j];
+                }
+            }
+            map[1][9] = playerValue;
+        } else {
+            return false;
         }
+        return true;
     }
 
     public static int numOfEnemies(int[][] map) {
@@ -365,7 +402,7 @@ public class ArrayGame {
         // Set enemy health
         int[] enemyHealth = new int[enemies];
         for (int i = 0; i < enemies; i++) {
-            enemyHealth[i] = 30;
+            enemyHealth[i] = 0;
         }
 
         int enemiesLeft = enemies;
@@ -645,63 +682,63 @@ public class ArrayGame {
         for (int i = 0; i < playerInventory[0].length; i++) {
             for (int j = 0; j < playerInventory[0][0].length; j++) {
                 if (playerInventory[catagory][i][j] == 0) {
-                    prt("   ");
+                    prt("       ");
                 } else if (playerInventory[catagory][i][j] == -1) {
-                    prt("---");
+                    prt("-------");
                 } else if (playerInventory[catagory][i][j] == -2) {
-                    prt(" | ");
+                    prt("   |   ");
                 }
                 if (catagory == 0) {
                     // Weapons
                     if (playerInventory[catagory][i][j] == 20) {
                         // Print basic sword
                         // Damage = number
-                        prt(" / ");
+                        prt("   /   ");
                     } else if (playerInventory[catagory][i][j] == 30) {
                         // Print rare sword
                         // Damage = number
-                        prt(" / ");
+                        prt("   /   ");
                     } else if (playerInventory[catagory][i][j] == 50) {
                         // Print legendary sword
                         // Damage = number
-                        prt(" / ");
+                        prt("   /   ");
                     } else if (playerInventory[catagory][i][j] == 1) {
                         // Print basic bow
                         // Bow number multiplies arrow damage by its value
-                        prt(" ) ");
+                        prt("   )   ");
                     } else if (playerInventory[catagory][i][j] == 2) {
                         // Print legendary bow
                         // Bow number multiplies arrow damage by its value
-                        prt(" ) ");
+                        prt("   )   ");
                     } else if (playerInventory[catagory][i][j] == 10) {
                         // Print normal arrow
                         // Arrow damage = number
-                        prt(" > ");
+                        prt("  >  :" + numOfNormalArrows);
                     } else if (playerInventory[catagory][i][j] == 15) {
                         // Print sharp arrow
                         // Arrow damage = number
-                        prt(" > ");
+                        prt("  >  :" + numOfSharpArrows);
                     } else if (playerInventory[catagory][i][j] == 25) {
                         // Print explosive arrow
                         // Arrow damage = number
-                        prt(" > ");
+                        prt("  >  :" + numOfExplosiveArrows);
                     }
                 } else {
                     // Heals
                     // Number represents how much it heals the player by
                     if (playerInventory[catagory][i][j] == 10) {
                         // Print small heal
-                        prt(" . ");
+                        prt("  .  :" + numOfSmallHeals);
                     } else if (playerInventory[catagory][i][j] == 20) {
                         // Print medium heal
-                        prt(" O ");
+                        prt("  O  :" + numOfMediumHeals);
                     } else if (playerInventory[catagory][i][j] == 30) {
                         // Print large heal
-                        prt("(_)");
+                        prt(" (_) :" + numOfLargeHeals);
                     } else if (playerInventory[catagory][i][j] == 5) {
                         // Print suspicious heal
                         // Using this item may make the user lose health
-                        prt("_'-");
+                        prt(" _'- :" + numOfSuspiciousHeals);
                     }
                 }
             }
@@ -730,8 +767,7 @@ public class ArrayGame {
     }
 
     public static int[][] arrayImages(String name) {
-        // TODO
-        // Finish the image arrays for the locations
+        // Image arrays for the different locations
         if (name.equals("town")) {
             int[][] town = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
@@ -752,7 +788,23 @@ public class ArrayGame {
                     { 0, 4, 4, 4, 4, 4, 4, 4, 10, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return town;
         } else if (name.equals("healersLodge")) {
-            int[][] healersLodge = {};
+            int[][] healersLodge = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 0, 4, 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return healersLodge;
         } else if (name.equals("dungeonStart")) {
             int[][] start = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
@@ -763,18 +815,18 @@ public class ArrayGame {
                     { 5, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6 },
+                    { 5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8 },
                     { 5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 5 },
-                    { 6, 0, 3, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 3, 1, 0, 5 },
+                    { 9, 0, 3, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 3, 1, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return start;
         } else if (name.equals("dungeonMiddle")) {
-            int[][] middle = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 0 },
+            int[][] middle = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 9, 4, 4, 4, 4, 4, 4, 0 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 5 },
@@ -787,29 +839,29 @@ public class ArrayGame {
                     { 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 5 },
                     { 5, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 6 },
+                    { 5, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 8 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return middle;
         } else if (name.equals("dungeonEnd")) {
             int[][] end = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
+                    { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
+                    { 5, 0, 7, 7, 0, 0, 0, 4, 4, 4, 0, 0, 0, 7, 7, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 5, 0, 11, 0, 5, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
+                    { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
+                    { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
+                    { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 0, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 0 } };
+                    { 0, 4, 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return end;
         }
         return null;
