@@ -808,12 +808,13 @@ public class ArrayGame {
         }
 
         // Items on first page can only be bought once
-        if (page == 0 && numOfItem > 0) {
+        // This excludes arrows
+        if (page == 0 && numOfItem > 0 && boughtItem == 30 || page == 0 && numOfItem > 0 && boughtItem == 50 || page == 0 && numOfItem > 0 && boughtItem == 2) {
             canBuy = false;
         }
 
         // Ask how many items the player would like to buy
-        // Only applies to 2nd page items
+        // Only applies to 2nd page items and arrows
         int numBought = 1;
         if (page == 1 || page == 0 && boughtItem == 10 || page == 0 && boughtItem == 15
                 || page == 0 && boughtItem == 25) {
@@ -999,6 +1000,7 @@ public class ArrayGame {
                     { 0, 4, 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return end;
         }
+        // Should never happen
         return null;
     }
 }
