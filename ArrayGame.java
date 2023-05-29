@@ -23,7 +23,7 @@ public class ArrayGame {
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 0, -2, 0, -2, 0, -2 },
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
-            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 10, -2, 20, -2, 30, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
@@ -37,9 +37,9 @@ public class ArrayGame {
     static int numOfNormalArrows = 0;
     static int numOfSharpArrows = 0;
     static int numOfExplosiveArrows = 0;
-    static int numOfSmallHeals = 0;
-    static int numOfMediumHeals = 0;
-    static int numOfLargeHeals = 0;
+    static int numOfSmallHeals = 9;
+    static int numOfMediumHeals = 9;
+    static int numOfLargeHeals = 9;
     static int numOfSuspiciousHeals = 0;
 
     /**
@@ -406,39 +406,53 @@ public class ArrayGame {
             }
             prnSlow("You have " + playerHealth + " health points");
 
-            // Display battle options
-            String[] battleOptions = { "Sword strike", "Bow shot", "Inventory" };
-            for (int i = 0; i < battleOptions.length; i++) {
-                prnSlow(i + 1 + ") " + battleOptions[i]);
-            }
-            int selection = Integer.parseInt(input.nextLine());
+            boolean attacked = false;
+            while (!attacked) {
+                // Display battle options
+                String[] battleOptions = { "Sword strike", "Bow shot", "Inventory" };
+                for (int i = 0; i < battleOptions.length; i++) {
+                    prnSlow(i + 1 + ") " + battleOptions[i]);
+                }
+                int selection = Integer.parseInt(input.nextLine());
 
-            if (selection == 1) {
-                int choice = 0;
-                if (enemiesLeft > 1) {
-                    prnSlow("Which enemy will you attack?");
-                    for (int count = 0; count < enemiesLeft; count++) {
-                        prnSlow((count + 1) + ")  Enemy " + (count + 1));
-                    }
-                    choice = (Integer.parseInt(input.nextLine())) - 1;
-                } else {
-                    for (int i = 0; i < enemyLocs.length; i++) {
-                        if (enemyHealth[i] > 0) {
-                            choice = i;
+                if (selection == 1) {
+                    int choice = 0;
+                    if (enemiesLeft > 1) {
+                        prnSlow("Which enemy will you attack?");
+                        for (int count = 0; count < enemiesLeft; count++) {
+                            prnSlow((count + 1) + ")  Enemy " + (count + 1));
+                        }
+                        choice = (Integer.parseInt(input.nextLine())) - 1;
+                    } else {
+                        for (int i = 0; i < enemyLocs.length; i++) {
+                            if (enemyHealth[i] > 0) {
+                                choice = i;
+                            }
                         }
                     }
+                    attacks("sword", enemiesLeft);
+                    enemyHealth[choice] -= playerInventory[0][1][1];
+                    attacked = true;
+                } else if (selection == 2) {
+                    int arrowNum = itemDesignation(playerInventory, "9");
+
+                    if (arrowNum == 10 && numOfNormalArrows != 0 || arrowNum == 15 && numOfSharpArrows != 0
+                            || arrowNum == 25 && numOfExplosiveArrows != 0) {
+                        attacks("bow", enemiesLeft);
+                        for (int j = 0; j < enemiesLeft; j++) {
+                            enemyHealth[j] -= playerInventory[0][3][1] * playerInventory[0][5][1];
+                        }
+                        changeNumOfItem(arrowNum, -1);
+                        attacked = true;
+                    } else {
+                        prnSlow("You are out of the type of arrow you have equipped");
+                        prn("Switch the arrow you're using or choose a different attack");
+                    }
+                } else {
+                    inventory();
                 }
-                attacks("sword", enemiesLeft);
-                enemyHealth[choice] -= playerInventory[0][1][1];
-            } else if (selection == 2) {
-                attacks("bow", enemiesLeft);
-                for (int j = 0; j < enemiesLeft; j++) {
-                    enemyHealth[j] -= playerInventory[0][3][1] * playerInventory[0][5][1];
-                }
-            } else {
-                inventory();
             }
-            // Check is there are any enemies left
+            // Check if there are any enemies left
             for (int i = 0; i < enemyLocs.length; i++) {
                 if (enemyHealth[i] <= 0) {
                     defeatedEnemies++;
@@ -809,14 +823,14 @@ public class ArrayGame {
                 else if (randomNumber == 1)
                     playerHealth -= itemValue;
             }
-            changeNumOfItem(itemValue, 1);
-            prnSlow("You have " + playerHealth + " health points");
-            Thread.sleep(200);
+            changeNumOfItem(itemValue, -1);
         }
         // Check if the player's health went over the maximum value
         if (playerHealth > 100) {
             playerHealth = 100;
         }
+        prnSlow("You have " + playerHealth + " health points");
+        Thread.sleep(200);
     }
 
     /**
