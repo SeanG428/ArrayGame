@@ -442,7 +442,7 @@ public class ArrayGame {
                         for (int j = 0; j < enemiesLeft; j++) {
                             enemyHealth[j] -= playerInventory[0][3][1] * playerInventory[0][5][1];
                         }
-                        changeNumOfItem(arrowNum, -1);
+                        changeNumOfItem(arrowNum, -1, 0);
                         attacked = true;
                     } else {
                         prnSlow("You are out of the type of arrow you have equipped");
@@ -474,9 +474,16 @@ public class ArrayGame {
                 }
             }
         }
+        rewards(enemies);
+    }
 
+    /**
+     * 
+     * @param numOfEnemies The number of enemies the player beat
+     */
+    public static void rewards(int numOfEnemies) throws InterruptedException {
         // Get items for defeating enemies
-        for (int i = 0; i < enemies; i++) {
+        for (int i = 0; i < numOfEnemies; i++) {
             // Gold
             int goldEarned = (int) (10 * Math.random() + 10);
             gold += goldEarned;
@@ -484,12 +491,15 @@ public class ArrayGame {
             prnSlow("You now have " + gold + " gold");
             // Suspicious heals
             int chanceOfHeals = (int) (3 * Math.random());
-            if (chanceOfHeals == 0) {
+            //if (chanceOfHeals == 0) {
                 int suspiciousHealsFound = (int) (5 * Math.random() + 1);
-                numOfSuspiciousHeals += suspiciousHealsFound;
-                prnSlow("You found " + suspiciousHealsFound + " gold");
-                prnSlow("You now have " + numOfSuspiciousHeals + " gold");
-            }
+                if (numOfSuspiciousHeals == 0) {
+                    addItemToInventory(5, 1);
+                }
+                changeNumOfItem(5, suspiciousHealsFound, 1);
+                prnSlow("You found " + suspiciousHealsFound + " suspicious heals");
+                prnSlow("You now have " + numOfSuspiciousHeals + " suspicious heals");
+            //}
             Thread.sleep(1000);
         }
     }
@@ -823,7 +833,7 @@ public class ArrayGame {
                 else if (randomNumber == 1)
                     playerHealth -= itemValue;
             }
-            changeNumOfItem(itemValue, -1);
+            changeNumOfItem(itemValue, -1, 1);
         }
         // Check if the player's health went over the maximum value
         if (playerHealth > 100) {
@@ -935,17 +945,9 @@ public class ArrayGame {
             if (canBuy) {
                 if (numOfItem == 0) {
                     // Add new item to inventory
-                    boolean added = false;
-                    for (int i = 1; i < playerInventory[page].length - 1; i++) {
-                        for (int j = 0; j < playerInventory[page][0].length; j++) {
-                            if (playerInventory[page][i][j] == 0 && added == false) {
-                                playerInventory[page][i][j] = boughtItem;
-                                added = true;
-                            }
-                        }
-                    }
+                    addItemToInventory(boughtItem, page);
                 }
-                changeNumOfItem(boughtItem, numBought);
+                changeNumOfItem(boughtItem, numBought, page);
                 gold -= price;
             }
         }
@@ -957,8 +959,8 @@ public class ArrayGame {
      * @param itemNumber      The item they bought or used
      * @param numBoughtOrUsed The number of items bought or used
      */
-    public static void changeNumOfItem(int itemNumber, int numBoughtOrUsed) {
-        if (page == 0) {
+    public static void changeNumOfItem(int itemNumber, int numBoughtOrUsed, int catagory) {
+        if (catagory == 0) {
             if (itemNumber == 10) {
                 numOfNormalArrows += numBoughtOrUsed;
             } else if (itemNumber == 15) {
@@ -975,6 +977,23 @@ public class ArrayGame {
                 numOfLargeHeals += numBoughtOrUsed;
             } else if (itemNumber == 5) {
                 numOfSuspiciousHeals += numBoughtOrUsed;
+            }
+        }
+    }
+
+    /**
+     * Add new items to the inventory
+     * 
+     * @param item The new item that will be added to the inventory
+     */
+    public static void addItemToInventory(int item, int catagory) {
+        boolean added = false;
+        for (int i = 1; i < playerInventory[catagory].length - 1; i++) {
+            for (int j = 0; j < playerInventory[catagory][0].length; j++) {
+                if (playerInventory[catagory][i][j] == 0 && added == false) {
+                    playerInventory[catagory][i][j] = item;
+                    added = true;
+                }
             }
         }
     }
