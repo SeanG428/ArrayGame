@@ -11,11 +11,10 @@ public class ArrayGame {
     static String obstacle = "&";
     static String player = "#";
     static String enemy = "!";
+
     static int obstacleValue = 1;
     static int playerValue = 2;
     static int enemyValue = 3;
-
-    static int test = 17;
 
     static int playerHealth = 100;
 
@@ -30,12 +29,11 @@ public class ArrayGame {
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
 
     static int page = 0;
-    static int inventoryRowSlots = 3;
-    static int inventoryColmSlots = 4;
 
+    // See if the user can close the inventory
     static boolean canClose = true;
 
-    static int gold = 100000;
+    static int gold = 100;
     static int numOfNormalArrows = 0;
     static int numOfSharpArrows = 0;
     static int numOfExplosiveArrows = 0;
@@ -44,16 +42,14 @@ public class ArrayGame {
     static int numOfLargeHeals = 0;
     static int numOfSuspiciousHeals = 0;
 
+    /**
+     * PLAN FOR GAME:
+     * Turn based game
+     * 15x15 map with borders (17x17 total)
+     * Multiple maps for different places
+     * Dungeon to explore, town to rest in
+     */
     public static void main(String[] args) throws Exception {
-        // PLAN FOR GAME:
-        // Turn based game
-        // 15x15 board with borders (17x17 total)
-        // Many boards to represent different places
-        // Dungeon to explore, town to rest in
-        // Town will include shops, a blacksmith, and a healers lodge
-        // Use locations to make enemies move towards player
-        // Player moves with w, a, s, d, x input
-        // Enemies move after player
 
         boolean done = false;
 
@@ -81,10 +77,17 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Clear the terminal
+     */
     public static void clear() {
         System.out.print("\033[H\033[2J");
     }
 
+    /**
+     * Slowly print text
+     * Used for words and sentences only
+     */
     public static void prnSlow(String text) throws InterruptedException {
         for (int i = 0; i < text.length(); i++) {
             System.out.print(text.charAt(i));
@@ -93,18 +96,23 @@ public class ArrayGame {
         System.out.println("\n");
     }
 
+    /**
+     * Print text and go down to the next line
+     */
     public static void prn(String text) {
         System.out.println(text);
     }
 
-    // public static void prn(int text) {
-    // System.out.println(text);
-    // }
-
+    /**
+     * Print text and don't go down to the next line
+     */
     public static void prt(String text) {
         System.out.print(text);
     }
 
+    /**
+     * Print the map arrays
+     */
     public static void printArray(int array[][], int rows, int colms) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < colms; j++) {
@@ -138,6 +146,12 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Search the map for the player
+     * 
+     * @return Returns player location value
+     * @return If no player is found, return null
+     */
     public static int[] playerLoc(int[][] map) {
         int[] currentLocation = new int[2];
         for (int i = 0; i < map.length; i++) {
@@ -145,16 +159,19 @@ public class ArrayGame {
                 if (map[i][j] == playerValue) {
                     currentLocation[0] = i;
                     currentLocation[1] = j;
-                    // Return as soon as player is found
                     return currentLocation;
                 }
             }
         }
-        // Return if no player is found
-        // Should never happen
         return null;
     }
 
+    /**
+     * Player chooses direction to travel in
+     * W = up, X = down, A = left, D = right, S = stay
+     * Press I to access inventory menu
+     * Movement options loop until the player has taken their turn
+     */
     public static void playerDirection(int[][] map) throws InterruptedException {
         int[] currentPlayerLoc = playerLoc(map);
 
@@ -181,6 +198,12 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Move the player based on the parameter's values
+     * Check if there is a door
+     * 
+     * @return Return true if the player has moved
+     */
     public static boolean playerMove(int[][] map, int row, int colm, int rowChange, int colmChange)
             throws InterruptedException {
         // Check if movement is possible
@@ -214,6 +237,10 @@ public class ArrayGame {
         return true;
     }
 
+    /**
+     * Transport player to the correct location
+     * Set player value to 1 spot away from the door they came through
+     */
     public static void doors(String locName, int transportRow, int transportColm) {
         mapName = locName;
         for (int i = 0; i < map.length; i++) {
@@ -224,6 +251,11 @@ public class ArrayGame {
         map[transportRow][transportColm] = playerValue;
     }
 
+    /**
+     * Count enemies in the map
+     * 
+     * @return Return the total number of enemies
+     */
     public static int numOfEnemies(int[][] map) {
         int enemies = 0;
         for (int i = 0; i < map.length; i++) {
@@ -236,8 +268,12 @@ public class ArrayGame {
         return enemies;
     }
 
+    /**
+     * Find all enemy locations
+     * 
+     * @return Return an array of all enemy locations in the map
+     */
     public static int[][] enemyLocations(int[][] map, int numOfEnemies) {
-        // Locate enemies
         int[][] enemyLoc = new int[numOfEnemies][2];
         for (int i = 0; i < numOfEnemies; i++) {
             // Times set variable prevents the correct location from being overwritten
@@ -255,6 +291,10 @@ public class ArrayGame {
         return enemyLoc;
     }
 
+    /**
+     * Set the direction the enemy will move in
+     * Loop until all enemies have moved
+     */
     public static void enemyDirection(int[][] map, int rows, int colms) {
         // Locate player
         int[] currentPlayerLoc = playerLoc(map);
@@ -263,14 +303,6 @@ public class ArrayGame {
         int enemies = numOfEnemies(map);
 
         int[][] enemyLocs = enemyLocations(map, enemies);
-
-        // Check enemy coordinates (print)
-        // for (int j = 0; j < enemyLocs.length; j++) {
-        // for (int k = 0; k < enemyLocs[0].length; k++) {
-        // prt(enemyLocs[j][k] + " ");
-        // }
-        // prn();
-        // }
 
         // Move enemies towards player
         for (int i = 0; i < enemies; i++) {
@@ -286,6 +318,9 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Move the designated enemy
+     */
     public static void moveEnemy(int[][] map, int row, int colm, int rowChange, int colmChange) {
         // Check if movement is possible
         if (map[row + rowChange][colm + colmChange] == 0
@@ -296,6 +331,9 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Check for how many enemies are near the player
+     */
     public static int checkForEnemies(int[][] map) {
         // Near enemies are one space away from the player
         // Not diagonally
@@ -319,6 +357,11 @@ public class ArrayGame {
         return numOfNearEnemies;
     }
 
+    /**
+     * Get the locations of all nearby enemies
+     * 
+     * @return Return the locations of all nearby enemies
+     */
     public static int[][] nearEnemyLocations(int[][] map, int numOfNearEnemies) {
         int[] currentPlayerLoc = playerLoc(map);
         int enemies = numOfEnemies(map);
@@ -328,26 +371,24 @@ public class ArrayGame {
         for (int slot = 0; slot < numOfNearEnemies; slot++) {
             int timesSet = 0;
             for (int i = 0; i < enemies; i++) {
-                if (currentPlayerLoc[0] + 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1]
-                        && timesSet <= slot) {
-                    nearEnemyLocs[slot][0] = enemyLocs[i][0];
-                    nearEnemyLocs[slot][1] = enemyLocs[i][1];
-                    timesSet++;
-                } else if (currentPlayerLoc[0] - 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1]
-                        && timesSet <= slot) {
-                    nearEnemyLocs[slot][0] = enemyLocs[i][0];
-                    nearEnemyLocs[slot][1] = enemyLocs[i][1];
-                    timesSet++;
-                } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] + 1 == enemyLocs[i][1]
-                        && timesSet <= slot) {
-                    nearEnemyLocs[slot][0] = enemyLocs[i][0];
-                    nearEnemyLocs[slot][1] = enemyLocs[i][1];
-                    timesSet++;
-                } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] - 1 == enemyLocs[i][1]
-                        && timesSet <= slot) {
-                    nearEnemyLocs[slot][0] = enemyLocs[i][0];
-                    nearEnemyLocs[slot][1] = enemyLocs[i][1];
-                    timesSet++;
+                if (timesSet <= slot) {
+                    if (currentPlayerLoc[0] + 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1]) {
+                        nearEnemyLocs[slot][0] = enemyLocs[i][0];
+                        nearEnemyLocs[slot][1] = enemyLocs[i][1];
+                        timesSet++;
+                    } else if (currentPlayerLoc[0] - 1 == enemyLocs[i][0] && currentPlayerLoc[1] == enemyLocs[i][1]) {
+                        nearEnemyLocs[slot][0] = enemyLocs[i][0];
+                        nearEnemyLocs[slot][1] = enemyLocs[i][1];
+                        timesSet++;
+                    } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] + 1 == enemyLocs[i][1]) {
+                        nearEnemyLocs[slot][0] = enemyLocs[i][0];
+                        nearEnemyLocs[slot][1] = enemyLocs[i][1];
+                        timesSet++;
+                    } else if (currentPlayerLoc[0] == enemyLocs[i][0] && currentPlayerLoc[1] - 1 == enemyLocs[i][1]) {
+                        nearEnemyLocs[slot][0] = enemyLocs[i][0];
+                        nearEnemyLocs[slot][1] = enemyLocs[i][1];
+                        timesSet++;
+                    }
                 }
             }
         }
@@ -355,9 +396,11 @@ public class ArrayGame {
         return nearEnemyLocs;
     }
 
+    /**
+     * Base functions for battle the scenario
+     * Loop until battle is over
+     */
     public static void battle(int[][] map, int[][] enemyLocs, int enemies) throws InterruptedException {
-        // Loop until battle is over
-        // Return player to the last place they were
         clear();
         if (enemies > 1) {
             prnSlow("You've encountered " + enemies + " enemies");
@@ -441,6 +484,13 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Create arrays for visual effects
+     * Loop to change how the images will be printed
+     * @param attackType
+     * @param numOfEnemies
+     * @throws InterruptedException
+    */
     public static void attacks(String attackType, int numOfEnemies) throws InterruptedException {
         String[] enemy = { "<(&)>___  ", "  | (*  );", "   |   \\| ", "  %==<^)  ", "  |   ((  ",
                 "       \\\\ ", "       // " };
@@ -478,6 +528,14 @@ public class ArrayGame {
         clear();
     }
 
+    /**
+     * Print sword attack animation
+     * @param player
+     * @param enemy
+     * @param spaceFront
+     * @param spaceBack
+     * @param numOfEnemies
+     */
     public static void printSwordAttack(String player[], String[] enemy, int spaceFront, int spaceBack,
             int numOfEnemies) {
         for (int i = 0; i < player.length; i++) {
@@ -495,6 +553,16 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Print bow and arrow attack animation
+     * @param player
+     * @param enemy
+     * @param arrow
+     * @param distance
+     * @param spaceFront
+     * @param spaceBack
+     * @param numOfEnemies
+     */
     public static void printBowAttack(String player[], String[] enemy, String arrow, int distance, int spaceFront,
             int spaceBack, int numOfEnemies) {
         for (int i = 0; i < player.length; i++) {
@@ -521,6 +589,14 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Print enemy attack animation
+     * Add 1 enemy into animation for each alive enemy
+     * @param player
+     * @param enemy
+     * @param spaceFront
+     * @param numOfEnemies
+     */
     public static void printEnemyAttack(String player[], String[] enemy, int spaceFront,
             int numOfEnemies) {
         for (int i = 0; i < player.length; i++) {
@@ -535,17 +611,19 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * 3 dimentional inventory menu
+     * First dimention: type/catagory (0: Weapons, 1: Heals)
+     * Second dimention: row
+     * Third dimention: collumn
+     * Player should be able to organise their inventory (swap)
+     * Items can only be swapped with other items in their catagory
+     * Player should be able to select items to use
+     * Items in use (sword, bow, etc.) will be in special slots
+     * Colours indicate what items are better
+     * @throws InterruptedException
+     */
     public static void inventory() throws InterruptedException {
-        // 3 dimentional inventory menu
-        // First dimention: type/catagory (0: Weapons, 1: Heals)
-        // Second dimention: row
-        // Third dimention: collumn
-        // Player should be able to organise their inventory (swap)
-        // Items can only be swapped with other items in their catagory
-        // Player should be able to select items to use
-        // Items in use (sword, bow, etc.) will be in special slots
-        // Colours indicate what items are better
-
         boolean looking = true;
         while (looking) {
             clear();
@@ -583,6 +661,12 @@ public class ArrayGame {
         clear();
     }
 
+    /**
+     * Swap the items in the spaces the player specified
+     * @param swapNums
+     * @param catagory
+     * @throws InterruptedException
+     */
     public static void swap(String[] swapNums, int catagory) throws InterruptedException {
         // Variables to store coordinates of the item and the item number value
         int[][] itemLoc = new int[2][2];
@@ -908,6 +992,14 @@ public class ArrayGame {
             }
         }
         return goldToSpend * numBought;
+    }
+
+    public static void useItem(String itemName) {
+        // TODO
+        // Enable item usage
+        if (itemName.equals("")) {
+
+        }
     }
 
     public static int[][] arrayImages(String name) {
