@@ -49,7 +49,6 @@ public class ArrayGame {
      * Multiple maps for different places
      * Dungeon to explore, town to rest in
      *
-     * @param args
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
@@ -59,7 +58,7 @@ public class ArrayGame {
         map[10][8] = playerValue;
 
         clear();
-        printArray(map, map.length, map[0].length);
+        printLocationArray(map, map.length, map[0].length);
 
         while (!done) {
             playerDirection(map);
@@ -68,95 +67,15 @@ public class ArrayGame {
                 enemyDirection(map, map.length, map[0].length);
 
             clear();
-            printArray(map, map.length, map[0].length);
+            printLocationArray(map, map.length, map[0].length);
             Thread.sleep(500);
 
             int numOfNearEnemies = checkForEnemies(map);
             if (numOfNearEnemies > 0) {
                 battle(map, nearEnemyLocations(map, numOfNearEnemies), numOfNearEnemies);
                 clear();
-                printArray(map, map.length, map[0].length);
+                printLocationArray(map, map.length, map[0].length);
             }
-        }
-    }
-
-    /**
-     * Clear the terminal
-     */
-    public static void clear() {
-        System.out.print("\033[H\033[2J");
-    }
-
-    /**
-     * Slowly print text
-     * Used for words and sentences only
-     * 
-     * @param text The string to be printed
-     * @throws InterruptedException
-     */
-    public static void prnSlow(String text) throws InterruptedException {
-        for (int i = 0; i < text.length(); i++) {
-            System.out.print(text.charAt(i));
-            Thread.sleep(20);
-        }
-        System.out.println("\n");
-    }
-
-    /**
-     * Print text and go down to the next line
-     * 
-     * @param text The string to be printed
-     */
-    public static void prn(String text) {
-        System.out.println(text);
-    }
-
-    /**
-     * Print text and don't go down to the next line
-     * 
-     * @param text
-     */
-    public static void prt(String text) {
-        System.out.print(text);
-    }
-
-    /**
-     * Print the map arrays
-     * 
-     * @param array The array to be printed
-     * @param rows  The number of rows in the array
-     * @param colms The number of collumns in the array
-     */
-    public static void printArray(int array[][], int rows, int colms) {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < colms; j++) {
-                if (array[i][j] == 0) {
-                    prt("   ");
-                } else if (array[i][j] == 1) {
-                    prt(" & ");
-                } else if (array[i][j] == 2) {
-                    prt("\033[0;32m # \033[0m");
-                } else if (array[i][j] == 3) {
-                    prt("\033[0;31m ! \033[0m");
-                } else if (array[i][j] == 4) {
-                    prt("---");
-                } else if (array[i][j] == 5) {
-                    prt(" | ");
-                } else if (array[i][j] == 6) {
-                    prt("%%%");
-                } else if (array[i][j] == 7) {
-                    prt(" + ");
-                } else if (array[i][j] == 8) {
-                    prt(" X ");
-                } else if (array[i][j] == 9) {
-                    prt(" X ");
-                } else if (array[i][j] == 10) {
-                    prt(" X ");
-                } else if (array[i][j] == 11) {
-                    prt("<!>");
-                }
-            }
-            prn("");
         }
     }
 
@@ -197,7 +116,7 @@ public class ArrayGame {
 
         while (!moved) {
             clear();
-            printArray(map, map.length, map[0].length);
+            printLocationArray(map, map.length, map[0].length);
             String direction = input.nextLine();
             if (direction.equalsIgnoreCase("a")) {
                 moved = playerMove(map, currentPlayerLoc[0], currentPlayerLoc[1], 0, -1);
@@ -220,8 +139,8 @@ public class ArrayGame {
      * Check if there is a door
      * 
      * @param map        The current location array
-     * @param row        The number of rows in the map array
-     * @param colm       The number of collumns in the map array
+     * @param row        The row number of the player
+     * @param colm       The collumn number of the player
      * @param rowChange  The change in the row number
      * @param colmChange The change in the collumn number
      * @return Return true if the player moved
@@ -240,6 +159,15 @@ public class ArrayGame {
             shop();
         } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("town")) {
             doors("healersLodge", 15, 8);
+
+            // Restore health when the player enters the healers lodge
+            clear();
+            printLocationArray(map, map.length, map[0].length);
+
+            prnSlow("Your health has been restored");
+            Thread.sleep(1000);
+
+            playerHealth = 100;
         } else if (map[row + rowChange][colm + colmChange] == 10 && mapName.equals("town")) {
             doors("dungeonStart", 8, 15);
         } else if (map[row + rowChange][colm + colmChange] == 8 && mapName.equals("healersLodge")) {
@@ -532,6 +460,24 @@ public class ArrayGame {
                 }
             }
         }
+
+        // Get items for defeating enemies
+        for (int i = 0; i < enemies; i++) {
+            // Gold
+            int goldEarned = (int) (10 * Math.random() + 10);
+            gold += goldEarned;
+            prnSlow("You found " + goldEarned + " gold");
+            prnSlow("You now have " + gold + " gold");
+            // Suspicious heals
+            int chanceOfHeals = (int) (3 * Math.random());
+            if (chanceOfHeals == 0) {
+                int suspiciousHealsFound = (int) (5 * Math.random() + 1);
+                numOfSuspiciousHeals += suspiciousHealsFound;
+                prnSlow("You found " + suspiciousHealsFound + " gold");
+                prnSlow("You now have " + numOfSuspiciousHeals + " gold");
+            }
+            Thread.sleep(1000);
+        }
     }
 
     /**
@@ -666,89 +612,6 @@ public class ArrayGame {
     }
 
     /**
-     * 3 dimentional inventory menu
-     * First dimention: type/catagory (0: Weapons, 1: Heals)
-     * Second dimention: row
-     * Third dimention: collumn
-     * Player should be able to organise their inventory (swap)
-     * Items can only be swapped with other items in their catagory
-     * Player should be able to select items to use
-     * Items in use (sword, bow, etc.) will be in special slots
-     * Colours indicate what items are better
-     * 
-     * @throws InterruptedException
-     */
-    public static void inventory() throws InterruptedException {
-        boolean looking = true;
-        while (looking) {
-            clear();
-            prnSlow("Page " + (page + 1) + " of 2");
-            printInventoryAndShop(playerInventory);
-            prn("\nValid commands (non case sensitive, must be separated by spaces):");
-            prn("- Swap (slot 1) (slot 2)");
-            prn("- Flip page");
-            if (page == 1) {
-                prn("- Use item (slot)");
-            }
-            prn("- Close");
-            String[] command = (input.nextLine()).split(" ");
-
-            if (command[0].equalsIgnoreCase("swap")) {
-                // Swap
-                swap(command, page);
-            } else if (command[0].equalsIgnoreCase("flip")) {
-                // flip page
-                if (page == 1) {
-                    page = 0;
-                } else {
-                    page = 1;
-                }
-            } else if (command[0].equalsIgnoreCase("flip") && page == 1) {
-                // Use item
-            } else if (command[0].equalsIgnoreCase("close") && canClose == true) {
-                // Close inventory menu
-                looking = false;
-            } else {
-                prnSlow("You may not close the inventory unless all items are in the correct slots.");
-                Thread.sleep(1000);
-            }
-        }
-        clear();
-    }
-
-    /**
-     * Swap the items in the spaces the player specified
-     * 
-     * @param swapNums The locations that the player want to swap the items in
-     * @param catagory The page of the inventory
-     * @throws InterruptedException
-     */
-    public static void swap(String[] swapNums, int catagory) throws InterruptedException {
-        // Variables to store coordinates of the item and the item number value
-        int[][] itemLoc = new int[2][2];
-        int[] item = { 0, 0 };
-
-        // Convert the box number the player will read to the actual coordinate
-        for (int i = 0; i < itemLoc.length; i++) {
-            itemLoc[i] = playerVisualToArrayLocs(swapNums[i + 1]);
-        }
-
-        // Swap the items
-        item[0] = playerInventory[catagory][itemLoc[0][0]][itemLoc[0][1]];
-        item[1] = playerInventory[catagory][itemLoc[1][0]][itemLoc[1][1]];
-
-        playerInventory[catagory][itemLoc[0][0]][itemLoc[0][1]] = item[1];
-        playerInventory[catagory][itemLoc[1][0]][itemLoc[1][1]] = item[0];
-
-        boolean inOrder = weaponSlotCheck();
-        if (!inOrder) {
-            canClose = false;
-        } else {
-            canClose = true;
-        }
-    }
-
-    /**
      * Convert what the player thinks is an item location to what is actually an
      * item location
      * 
@@ -795,6 +658,348 @@ public class ArrayGame {
             itemLoc[1] = 7;
         }
         return itemLoc;
+    }
+
+    /**
+     * Determine what item is being chosen
+     * 
+     * @param itemArray    The array containing the available items
+     * @param playerVisual The box number/location the player will assume
+     * @return Return the number value of the item
+     */
+    public static int itemDesignation(int[][][] itemArray, String playerVisual) {
+        // Convert the box number the player will read to the actual coordinate
+        int[] itemLoc = playerVisualToArrayLocs(playerVisual);
+        int itemNumberValue = 0;
+        for (int i = 0; i < itemArray[page].length; i++) {
+            for (int j = 0; j < itemArray[page][0].length; j++) {
+                if (i == itemLoc[0] && j == itemLoc[1]) {
+                    itemNumberValue = itemArray[page][i][j];
+                }
+            }
+        }
+        return itemNumberValue;
+    }
+
+    /**
+     * 3 dimentional inventory menu
+     * First dimention: type/catagory (0: Weapons, 1: Heals)
+     * Second dimention: row
+     * Third dimention: collumn
+     * Player is able to organise their inventory (swap)
+     * Items can only be swapped with other items in their catagory
+     * Player is able to select items to use
+     * Items in use (sword, bow, etc.) will be in special slots
+     * Colours indicate what items are better
+     * 
+     * @throws InterruptedException
+     */
+    public static void inventory() throws InterruptedException {
+        boolean looking = true;
+        while (looking) {
+            clear();
+            prnSlow("Page " + (page + 1) + " of 2");
+            printInventoryAndShop(playerInventory);
+            prn("\nValid commands (non case sensitive, must be separated by spaces):");
+            prn("- Flip page");
+            prn("- Swap (slot 1) (slot 2)");
+            if (page == 1) {
+                prn("- Use (slot of item)");
+            }
+            prn("- Close");
+            String[] command = (input.nextLine()).split(" ");
+
+            if (command[0].equalsIgnoreCase("swap")) {
+                // Swap
+                swap(command, page);
+            } else if (command[0].equalsIgnoreCase("flip")) {
+                // flip page
+                if (page == 1) {
+                    page = 0;
+                } else {
+                    page = 1;
+                }
+            } else if (command[0].equalsIgnoreCase("use") && page == 1) {
+                // Use item
+                useItem(command[1]);
+            } else if (command[0].equalsIgnoreCase("close") && canClose == true) {
+                // Close inventory menu
+                looking = false;
+            } else {
+                prnSlow("You may not close the inventory unless all items are in the correct slots.");
+                Thread.sleep(1000);
+            }
+        }
+        clear();
+    }
+
+    /**
+     * Swap the items in the spaces the player specified
+     * 
+     * @param swapNums The locations that the player want to swap the items in
+     * @param catagory The page of the inventory
+     * @throws InterruptedException
+     */
+    public static void swap(String[] swapNums, int catagory) throws InterruptedException {
+        // Variables to store coordinates of the item and the item number value
+        int[][] itemLoc = new int[2][2];
+        int[] item = { 0, 0 };
+
+        // Convert the box number the player will read to the actual coordinate
+        for (int i = 0; i < itemLoc.length; i++) {
+            itemLoc[i] = playerVisualToArrayLocs(swapNums[i + 1]);
+        }
+
+        // Swap the items
+        item[0] = playerInventory[catagory][itemLoc[0][0]][itemLoc[0][1]];
+        item[1] = playerInventory[catagory][itemLoc[1][0]][itemLoc[1][1]];
+
+        playerInventory[catagory][itemLoc[0][0]][itemLoc[0][1]] = item[1];
+        playerInventory[catagory][itemLoc[1][0]][itemLoc[1][1]] = item[0];
+
+        boolean inOrder = weaponSlotCheck();
+        if (!inOrder) {
+            canClose = false;
+        } else {
+            canClose = true;
+        }
+    }
+
+    /**
+     * Checks if weapons are in the correct slot
+     * Prevents errors from occuring in battles
+     * 
+     * @return Return true if items are in the correct slots
+     * @throws InterruptedException
+     */
+    public static boolean weaponSlotCheck() throws InterruptedException {
+        boolean properSlot = true;
+        if (playerInventory[0][1][1] != 20 && playerInventory[0][1][1] != 30 && playerInventory[0][1][1] != 50) {
+            prnSlow("(Please put sword back in proper slot)");
+            Thread.sleep(1000);
+            properSlot = false;
+        }
+        if (playerInventory[0][3][1] != 1 && playerInventory[0][3][1] != 2) {
+            prnSlow("(Please put bow back in proper slot)");
+            Thread.sleep(1000);
+            properSlot = false;
+        }
+        if (playerInventory[0][5][1] != 10 && playerInventory[0][5][1] != 15 && playerInventory[0][5][1] != 25) {
+            prnSlow("(Please put arrow back in proper slot)");
+            Thread.sleep(1000);
+            properSlot = false;
+        }
+        return properSlot;
+    }
+
+    /**
+     * Find what number of item value needs to be changed
+     * 
+     * @param itemSlot The slot that the item the player wants to use is in
+     */
+    public static void useItem(String itemSlot) throws InterruptedException {
+        if (playerHealth < 100) {
+            int itemValue = itemDesignation(playerInventory, itemSlot);
+            if (itemValue > 5) {
+                playerHealth += itemValue;
+            } else {
+                int randomNumber = (int) (2 * Math.random());
+                if (randomNumber == 0)
+                    playerHealth += itemValue;
+                else if (randomNumber == 1)
+                    playerHealth -= itemValue;
+            }
+            changeNumOfItem(itemValue, 1);
+            prnSlow("You have " + playerHealth + " health points");
+            Thread.sleep(200);
+        }
+        // Check if the player's health went over the maximum value
+        if (playerHealth > 100) {
+            playerHealth = 100;
+        }
+    }
+
+    /**
+     * Allow player to buy from, flip the page of, or close the shop
+     * 
+     * @throws InterruptedException
+     */
+    public static void shop() throws InterruptedException {
+        // 3 dimentional shop menu
+        // Works similarly to inventory menu
+        clear();
+        int[][][] shopItems = {
+                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 30, -2, 50, -2, 0, -2, },
+                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 2, -2, 0, -2 },
+                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 15, -2, 25, -2, 0, -2 },
+                        { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
+                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 10, -2, 20, -2, 30, -2, 5, -2 },
+                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                        { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
+
+        boolean done = false;
+        while (!done) {
+            printInventoryAndShop(shopItems);
+
+            prnSlow("What would you like to buy? (non-case sensitive)");
+            prnSlow("- Flip page");
+            prnSlow("- Buy (slot)");
+            prnSlow("- Close");
+
+            String[] selection = (input.nextLine()).split(" ");
+
+            if (selection[0].equalsIgnoreCase("flip")) {
+                if (page == 0) {
+                    page = 1;
+                } else {
+                    page = 0;
+                }
+            } else if (selection[0].equalsIgnoreCase("buy")) {
+                buy(shopItems, selection);
+            } else if (selection[0].equalsIgnoreCase("close")) {
+                done = true;
+            }
+        }
+    }
+
+    /**
+     * Buy function of shop
+     * 
+     * @param shopItems The array of all items in the shop
+     * @param in        The input from the user
+     * @throws InterruptedException
+     */
+    public static void buy(int[][][] shopItems, String[] in) throws InterruptedException {
+        boolean canBuy = true;
+
+        int boughtItem = itemDesignation(shopItems, in[1]);
+
+        int numOfItem = 0;
+        // Check if the player already has the item
+        for (int i = 0; i < playerInventory[page].length; i++) {
+            for (int j = 0; j < playerInventory[page][0].length; j++) {
+                if (playerInventory[page][i][j] == boughtItem) {
+                    numOfItem++;
+                }
+            }
+        }
+
+        // Items on first page can only be bought once
+        // This excludes arrows
+        if (page == 0 && numOfItem > 0 && boughtItem == 30 || page == 0 && numOfItem > 0 && boughtItem == 50
+                || page == 0 && numOfItem > 0 && boughtItem == 2) {
+            canBuy = false;
+        }
+
+        // Cancel the rest of the shop options if they already own the item
+        if (canBuy) {
+            // Ask how many items the player would like to buy
+            // Only applies to 2nd page items and arrows
+            int numBought = 1;
+            if (page == 1 || page == 0 && boughtItem == 10 || page == 0 && boughtItem == 15
+                    || page == 0 && boughtItem == 25) {
+                prnSlow("How many would you like to buy?");
+                numBought = Integer.parseInt(input.nextLine());
+            }
+
+            int price = costOfItem(boughtItem, numBought);
+            if (price > gold) {
+                canBuy = false;
+            } else {
+                prnSlow("The cost of your items is " + price + " gold");
+                prnSlow("You have " + gold + " gold");
+                prnSlow("Would you like to purchase these items? (y/n)");
+                String choice = input.nextLine();
+
+                if (choice.equalsIgnoreCase("n")) {
+                    canBuy = false;
+                }
+            }
+
+            // Check if they still can/want to buy the item before proceeding
+            if (canBuy) {
+                if (numOfItem == 0) {
+                    // Add new item to inventory
+                    boolean added = false;
+                    for (int i = 1; i < playerInventory[page].length - 1; i++) {
+                        for (int j = 0; j < playerInventory[page][0].length; j++) {
+                            if (playerInventory[page][i][j] == 0 && added == false) {
+                                playerInventory[page][i][j] = boughtItem;
+                                added = true;
+                            }
+                        }
+                    }
+                }
+                changeNumOfItem(boughtItem, numBought);
+                gold -= price;
+            }
+        }
+    }
+
+    /**
+     * Add the number of items that were bought or used to the counter for the item
+     * 
+     * @param itemNumber      The item they bought or used
+     * @param numBoughtOrUsed The number of items bought or used
+     */
+    public static void changeNumOfItem(int itemNumber, int numBoughtOrUsed) {
+        if (page == 0) {
+            if (itemNumber == 10) {
+                numOfNormalArrows += numBoughtOrUsed;
+            } else if (itemNumber == 15) {
+                numOfSharpArrows += numBoughtOrUsed;
+            } else if (itemNumber == 25) {
+                numOfExplosiveArrows += numBoughtOrUsed;
+            }
+        } else {
+            if (itemNumber == 10) {
+                numOfSmallHeals += numBoughtOrUsed;
+            } else if (itemNumber == 20) {
+                numOfMediumHeals += numBoughtOrUsed;
+            } else if (itemNumber == 30) {
+                numOfLargeHeals += numBoughtOrUsed;
+            } else if (itemNumber == 5) {
+                numOfSuspiciousHeals += numBoughtOrUsed;
+            }
+        }
+    }
+
+    /**
+     * Calculate how much buying the item(s) will cost the player
+     * 
+     * @param itemNumber The item
+     * @param numBought  The number the player wants to buy
+     * @return Return the cost of the item
+     */
+    public static int costOfItem(int itemNumber, int numBought) {
+        int goldToSpend = 0;
+        if (page == 0) {
+            if (itemNumber == 30) {
+                goldToSpend = 100;
+            } else if (itemNumber == 50) {
+                goldToSpend = 200;
+            } else if (itemNumber == 2) {
+                goldToSpend = 150;
+            } else if (itemNumber == 10) {
+                goldToSpend = 10;
+            } else if (itemNumber == 15) {
+                goldToSpend = 15;
+            } else if (itemNumber == 25) {
+                goldToSpend = 20;
+            }
+        } else {
+            if (itemNumber == 10) {
+                goldToSpend = 10;
+            } else if (itemNumber == 20) {
+                goldToSpend = 20;
+            } else if (itemNumber == 30) {
+                goldToSpend = 30;
+            } else if (itemNumber == 5) {
+                goldToSpend = 0;
+            }
+        }
+        return goldToSpend * numBought;
     }
 
     /**
@@ -876,243 +1081,42 @@ public class ArrayGame {
     }
 
     /**
-     * Checks if weapons are in the correct slot
-     * Prevents errors from occuring in battles
+     * Print the map arrays
      * 
-     * @return Return true if items are in the correct slots
-     * @throws InterruptedException
+     * @param array The array to be printed
+     * @param rows  The number of rows in the array
+     * @param colms The number of collumns in the array
      */
-    public static boolean weaponSlotCheck() throws InterruptedException {
-        boolean properSlot = true;
-        if (playerInventory[0][1][1] != 20 && playerInventory[0][1][1] != 30 && playerInventory[0][1][1] != 50) {
-            prnSlow("(Please put sword back in proper slot)");
-            Thread.sleep(1000);
-            properSlot = false;
-        }
-        if (playerInventory[0][3][1] != 1 && playerInventory[0][3][1] != 2) {
-            prnSlow("(Please put bow back in proper slot)");
-            Thread.sleep(1000);
-            properSlot = false;
-        }
-        if (playerInventory[0][5][1] != 10 && playerInventory[0][5][1] != 15 && playerInventory[0][5][1] != 25) {
-            prnSlow("(Please put arrow back in proper slot)");
-            Thread.sleep(1000);
-            properSlot = false;
-        }
-        return properSlot;
-    }
-
-    /**
-     * Allow player to buy from, flip the page of, or close the shop
-     * 
-     * @throws InterruptedException
-     */
-    public static void shop() throws InterruptedException {
-        // 3 dimentional shop menu
-        // Works similarly to inventory menu
-        clear();
-        int[][][] shopItems = {
-                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 30, -2, 50, -2, 0, -2, },
-                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 2, -2, 0, -2 },
-                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 15, -2, 25, -2, 0, -2 },
-                        { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
-                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 10, -2, 20, -2, 30, -2, 5, -2 },
-                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
-                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
-                        { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
-
-        boolean done = false;
-        while (!done) {
-            printInventoryAndShop(shopItems);
-
-            prnSlow("What would you like to buy? (non-case sensitive)");
-            prnSlow("- Flip page");
-            prnSlow("- Buy (slot)");
-            prnSlow("- Close");
-
-            String[] selection = (input.nextLine()).split(" ");
-
-            if (selection[0].equalsIgnoreCase("flip")) {
-                if (page == 0) {
-                    page = 1;
-                } else {
-                    page = 0;
-                }
-            } else if (selection[0].equalsIgnoreCase("buy")) {
-                buy(shopItems, selection);
-            } else if (selection[0].equalsIgnoreCase("close")) {
-                done = true;
-            }
-        }
-    }
-
-    /**
-     * Buy function of shop
-     * 
-     * @param shopItems The array of all items in the shop
-     * @param in        The input from the user
-     * @throws InterruptedException
-     */
-    public static void buy(int[][][] shopItems, String[] in) throws InterruptedException {
-        // Convert the box number the player will read to the actual coordinate
-        int[] itemLoc = playerVisualToArrayLocs(in[1]);
-
-        int boughtItem = 0;
-        boolean canBuy = true;
-
-        // Determine number value of the bought item
-        for (int i = 0; i < shopItems[page].length; i++) {
-            for (int j = 0; j < shopItems[page][0].length; j++) {
-                if (i == itemLoc[0] && j == itemLoc[1]) {
-                    boughtItem = shopItems[page][i][j];
+    public static void printLocationArray(int array[][], int rows, int colms) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < colms; j++) {
+                if (array[i][j] == 0) {
+                    prt("   ");
+                } else if (array[i][j] == 1) {
+                    prt(" & ");
+                } else if (array[i][j] == 2) {
+                    prt("\033[0;32m # \033[0m");
+                } else if (array[i][j] == 3) {
+                    prt("\033[0;31m ! \033[0m");
+                } else if (array[i][j] == 4) {
+                    prt("---");
+                } else if (array[i][j] == 5) {
+                    prt(" | ");
+                } else if (array[i][j] == 6) {
+                    prt("%%%");
+                } else if (array[i][j] == 7) {
+                    prt(" + ");
+                } else if (array[i][j] == 8) {
+                    prt(" X ");
+                } else if (array[i][j] == 9) {
+                    prt(" X ");
+                } else if (array[i][j] == 10) {
+                    prt(" X ");
+                } else if (array[i][j] == 11) {
+                    prt("<!>");
                 }
             }
-        }
-
-        int numOfItem = 0;
-        // Check if the player already has the item
-        for (int i = 0; i < playerInventory[page].length; i++) {
-            for (int j = 0; j < playerInventory[page][0].length; j++) {
-                if (playerInventory[page][i][j] == boughtItem) {
-                    numOfItem++;
-                }
-            }
-        }
-
-        // Items on first page can only be bought once
-        // This excludes arrows
-        if (page == 0 && numOfItem > 0 && boughtItem == 30 || page == 0 && numOfItem > 0 && boughtItem == 50
-                || page == 0 && numOfItem > 0 && boughtItem == 2) {
-            canBuy = false;
-        }
-
-        // Cancel the rest of the shop options if they already own the item
-        if (canBuy) {
-            // Ask how many items the player would like to buy
-            // Only applies to 2nd page items and arrows
-            int numBought = 1;
-            if (page == 1 || page == 0 && boughtItem == 10 || page == 0 && boughtItem == 15
-                    || page == 0 && boughtItem == 25) {
-                prnSlow("How many would you like to buy?");
-                numBought = Integer.parseInt(input.nextLine());
-            }
-
-            int price = costOfItem(boughtItem, numBought);
-            if (price > gold) {
-                canBuy = false;
-            } else {
-                prnSlow("The cost of your items is " + price + " gold");
-                prnSlow("You have " + gold + " gold");
-                prnSlow("Would you like to purchase these items? (y/n)");
-                String choice = input.nextLine();
-
-                if (choice.equalsIgnoreCase("n")) {
-                    canBuy = false;
-                }
-            }
-
-            // Check if they still can/want to buy the item before proceeding
-            if (canBuy) {
-                if (numOfItem == 0) {
-                    // Add new item to inventory
-                    boolean added = false;
-                    for (int i = 1; i < playerInventory[page].length - 1; i++) {
-                        for (int j = 0; j < playerInventory[page][0].length; j++) {
-                            if (playerInventory[page][i][j] == 0 && added == false) {
-                                playerInventory[page][i][j] = boughtItem;
-                                added = true;
-                            }
-                        }
-                    }
-                }
-                changeNumOfItem(boughtItem, numBought);
-                gold -= price;
-            }
-        }
-    }
-
-    /**
-     * Add the number of items that were bought or used to the counter for the item
-     * 
-     * @param itemDesignation The item they bought or used
-     * @param numBoughtOrUsed The number of items bought or used
-     */
-    public static void changeNumOfItem(int itemDesignation, int numBoughtOrUsed) {
-        if (page == 0) {
-            if (itemDesignation == 10) {
-                numOfNormalArrows += numBoughtOrUsed;
-            } else if (itemDesignation == 15) {
-                numOfSharpArrows += numBoughtOrUsed;
-            } else if (itemDesignation == 25) {
-                numOfExplosiveArrows += numBoughtOrUsed;
-            }
-        } else {
-            if (itemDesignation == 10) {
-                numOfSmallHeals += numBoughtOrUsed;
-            } else if (itemDesignation == 20) {
-                numOfMediumHeals += numBoughtOrUsed;
-            } else if (itemDesignation == 30) {
-                numOfLargeHeals += numBoughtOrUsed;
-            } else if (itemDesignation == 5) {
-                numOfSuspiciousHeals += numBoughtOrUsed;
-            }
-        }
-    }
-
-    /**
-     * Calculate how much buying the item(s) will cost the player
-     * 
-     * @param itemDesignation The item
-     * @param numBought       The number the player wants to buy
-     * @return Return the cost of the item
-     */
-    public static int costOfItem(int itemDesignation, int numBought) {
-        int goldToSpend = 0;
-        if (page == 0) {
-            if (itemDesignation == 30) {
-                goldToSpend = 100;
-            } else if (itemDesignation == 50) {
-                goldToSpend = 200;
-            } else if (itemDesignation == 2) {
-                goldToSpend = 150;
-            } else if (itemDesignation == 10) {
-                goldToSpend = 10;
-            } else if (itemDesignation == 15) {
-                goldToSpend = 15;
-            } else if (itemDesignation == 25) {
-                goldToSpend = 20;
-            }
-        } else {
-            if (itemDesignation == 10) {
-                goldToSpend = 10;
-            } else if (itemDesignation == 20) {
-                goldToSpend = 20;
-            } else if (itemDesignation == 30) {
-                goldToSpend = 30;
-            } else if (itemDesignation == 5) {
-                goldToSpend = 0;
-            }
-        }
-        return goldToSpend * numBought;
-    }
-
-    /**
-     * Find what number of item value needs to be changed
-     * 
-     * @param itemName The item the player wants to use
-     */
-    public static void useItem(String itemName) {
-        // TODO
-        // Enable item usage
-        if (itemName.equals("smallHeal")) {
-            playerHealth += 10;
-        } else if (itemName.equals("mediumHeal")) {
-            playerHealth += 20;
-        } else if (itemName.equals("largeHeal")) {
-            playerHealth += 30;
-        } else if (itemName.equals("suspiciousHeal")) {
-            int randomNumber = 0;
-            playerHealth += 5;
+            prn("");
         }
     }
 
@@ -1146,19 +1150,19 @@ public class ArrayGame {
         } else if (name.equals("healersLodge")) {
             int[][] healersLodge = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 7, 4, 7, 0, 0, 7, 4, 7, 0, 0, 7, 4, 7, 0, 5 },
+                    { 5, 0, 5, 0, 5, 0, 0, 5, 0, 5, 0, 0, 5, 0, 5, 0, 5 },
+                    { 5, 0, 7, 4, 7, 0, 0, 7, 4, 7, 0, 0, 7, 4, 7, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 7, 4, 7, 0, 0, 0, 0, 0, 0, 0, 7, 4, 7, 0, 5 },
+                    { 5, 0, 5, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5, 0, 5, 0, 5 },
+                    { 5, 0, 7, 4, 7, 0, 0, 0, 0, 0, 0, 0, 7, 4, 7, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 7, 4, 7, 0, 0, 5, 0, 5, 0, 0, 7, 4, 7, 0, 5 },
+                    { 5, 0, 5, 0, 5, 0, 0, 4, 4, 4, 0, 0, 5, 0, 5, 0, 5 },
+                    { 5, 0, 7, 4, 7, 0, 0, 0, 0, 0, 0, 0, 7, 4, 7, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 0, 4, 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return healersLodge;
@@ -1166,7 +1170,7 @@ public class ArrayGame {
             int[][] start = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 5 },
-                    { 5, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 1, 3, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 5 },
@@ -1176,8 +1180,8 @@ public class ArrayGame {
                     { 5, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 5 },
-                    { 9, 0, 3, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 3, 1, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 5 },
+                    { 9, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 3, 1, 0, 5 },
+                    { 5, 0, 0, 0, 3, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return start;
@@ -1185,26 +1189,26 @@ public class ArrayGame {
             int[][] middle = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 9, 4, 4, 4, 4, 4, 4, 0 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 5 },
-                    { 5, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 5 },
+                    { 5, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 5 },
+                    { 5, 0, 0, 1, 3, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 5 },
                     { 5, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 5 },
                     { 5, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 5 },
                     { 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-                    { 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 5 },
-                    { 5, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 5 },
+                    { 5, 0, 1, 3, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 8 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5 },
                     { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return middle;
         } else if (name.equals("dungeonEnd")) {
             int[][] end = { { 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0 },
                     { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
                     { 5, 0, 7, 7, 0, 0, 0, 4, 4, 4, 0, 0, 0, 7, 7, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 5, 0, 11, 0, 5, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
                     { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
@@ -1222,5 +1226,45 @@ public class ArrayGame {
         }
         // Should never happen
         return null;
+    }
+
+    /**
+     * Clear the terminal
+     */
+    public static void clear() {
+        System.out.print("\033[H\033[2J");
+    }
+
+    /**
+     * Slowly print text
+     * Used for words and sentences only
+     * 
+     * @param text The string to be printed
+     * @throws InterruptedException
+     */
+    public static void prnSlow(String text) throws InterruptedException {
+        for (int i = 0; i < text.length(); i++) {
+            System.out.print(text.charAt(i));
+            Thread.sleep(20);
+        }
+        System.out.println("\n");
+    }
+
+    /**
+     * Print text and go down to the next line
+     * 
+     * @param text The string to be printed
+     */
+    public static void prn(String text) {
+        System.out.println(text);
+    }
+
+    /**
+     * Print text and don't go down to the next line
+     * 
+     * @param text
+     */
+    public static void prt(String text) {
+        System.out.print(text);
     }
 }
