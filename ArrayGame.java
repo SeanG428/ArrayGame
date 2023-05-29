@@ -70,6 +70,7 @@ public class ArrayGame {
 
             clear();
             printArray(map, map.length, map[0].length);
+            Thread.sleep(500);
 
             int numOfNearEnemies = checkForEnemies(map);
             if (numOfNearEnemies > 0) {
@@ -605,7 +606,7 @@ public class ArrayGame {
         }
     }
 
-    public static int[] playerVisualToArrayLocs(String num, int index) {
+    public static int[] playerVisualToArrayLocs(String num) {
         int[] itemLoc = new int[2];
         if (num.equals("1") || num.equalsIgnoreCase("one")) {
             itemLoc[0] = 1;
@@ -769,14 +770,34 @@ public class ArrayGame {
                     page = 0;
                 }
             } else if (selection[0].equalsIgnoreCase("buy")) {
-                buy(selection);
+                buy(shopItems, selection);
             } else if (selection[0].equalsIgnoreCase("close")) {
                 done = true;
             }
         }
     }
 
-    public static void buy(String[] in) {
+    public static void buy(int[][][] shopItems, String[] in) {
+        int[] itemLoc = playerVisualToArrayLocs(in);
+        int boughtItem = 0;
+
+        // Determine number value of the bought item
+        for (int i = 0; i < shopItems[page][0].length; i++) {
+            for (int j = 0; j < shopItems[page][0][0].length; j++) {
+                if (i == itemLoc[0] && j == itemLoc[1]) {
+                    boughtItem = shopItems[page][i][j];
+                }
+            }
+        }
+
+        // Add new item to inventory
+        for (int i = 0; i < playerInventory[page].length; i++) {
+            for (int j = 0; j < playerInventory[page][0].length; j++) {
+                if (playerInventory[page][i][j] == 0) {
+                    playerInventory[page][i][j] = boughtItem;
+                }
+            }
+        }
     }
 
     public static int[][] arrayImages(String name) {
