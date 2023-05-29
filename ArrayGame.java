@@ -1104,8 +1104,15 @@ public class ArrayGame {
     public static void useItem(String itemName) {
         // TODO
         // Enable item usage
-        if (itemName.equals("")) {
-
+        if (itemName.equals("smallHeal")) {
+            playerHealth += 10;
+        } else if (itemName.equals("mediumHeal")) {
+            playerHealth += 20;
+        } else if (itemName.equals("largeHeal")) {
+            playerHealth += 30;
+        } else if (itemName.equals("suspiciousHeal")) {
+            int randomNumber = 0;
+            playerHealth += 5;
         }
     }
 
