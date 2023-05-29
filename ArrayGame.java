@@ -48,6 +48,9 @@ public class ArrayGame {
      * 15x15 map with borders (17x17 total)
      * Multiple maps for different places
      * Dungeon to explore, town to rest in
+     *
+     * @param args
+     * @throws Exception
      */
     public static void main(String[] args) throws Exception {
 
@@ -87,6 +90,9 @@ public class ArrayGame {
     /**
      * Slowly print text
      * Used for words and sentences only
+     * 
+     * @param text The string to be printed
+     * @throws InterruptedException
      */
     public static void prnSlow(String text) throws InterruptedException {
         for (int i = 0; i < text.length(); i++) {
@@ -98,6 +104,8 @@ public class ArrayGame {
 
     /**
      * Print text and go down to the next line
+     * 
+     * @param text The string to be printed
      */
     public static void prn(String text) {
         System.out.println(text);
@@ -105,6 +113,8 @@ public class ArrayGame {
 
     /**
      * Print text and don't go down to the next line
+     * 
+     * @param text
      */
     public static void prt(String text) {
         System.out.print(text);
@@ -112,6 +122,10 @@ public class ArrayGame {
 
     /**
      * Print the map arrays
+     * 
+     * @param array The array to be printed
+     * @param rows  The number of rows in the array
+     * @param colms The number of collumns in the array
      */
     public static void printArray(int array[][], int rows, int colms) {
         for (int i = 0; i < rows; i++) {
@@ -147,10 +161,10 @@ public class ArrayGame {
     }
 
     /**
-     * Search the map for the player
+     * Find the current location of the map
      * 
-     * @return Returns player location value
-     * @return If no player is found, return null
+     * @param map The current location array
+     * @return The location of the map
      */
     public static int[] playerLoc(int[][] map) {
         int[] currentLocation = new int[2];
@@ -171,6 +185,9 @@ public class ArrayGame {
      * W = up, X = down, A = left, D = right, S = stay
      * Press I to access inventory menu
      * Movement options loop until the player has taken their turn
+     * 
+     * @param map The current location array
+     * @throws InterruptedException
      */
     public static void playerDirection(int[][] map) throws InterruptedException {
         int[] currentPlayerLoc = playerLoc(map);
@@ -202,7 +219,13 @@ public class ArrayGame {
      * Move the player based on the parameter's values
      * Check if there is a door
      * 
-     * @return Return true if the player has moved
+     * @param map        The current location array
+     * @param row        The number of rows in the map array
+     * @param colm       The number of collumns in the map array
+     * @param rowChange  The change in the row number
+     * @param colmChange The change in the collumn number
+     * @return Return true if the player moved
+     * @throws InterruptedException
      */
     public static boolean playerMove(int[][] map, int row, int colm, int rowChange, int colmChange)
             throws InterruptedException {
@@ -240,6 +263,10 @@ public class ArrayGame {
     /**
      * Transport player to the correct location
      * Set player value to 1 spot away from the door they came through
+     * 
+     * @param locName       The location the player will be sent to
+     * @param transportRow  The row number that the playerValue will be in
+     * @param transportColm The collumn number that the PLayerValue will be in
      */
     public static void doors(String locName, int transportRow, int transportColm) {
         mapName = locName;
@@ -254,7 +281,8 @@ public class ArrayGame {
     /**
      * Count enemies in the map
      * 
-     * @return Return the total number of enemies
+     * @param map The current location array
+     * @return The Number of enemies
      */
     public static int numOfEnemies(int[][] map) {
         int enemies = 0;
@@ -271,6 +299,8 @@ public class ArrayGame {
     /**
      * Find all enemy locations
      * 
+     * @param map          The current location array
+     * @param numOfEnemies The number of enemies in the current location array
      * @return Return an array of all enemy locations in the map
      */
     public static int[][] enemyLocations(int[][] map, int numOfEnemies) {
@@ -294,6 +324,10 @@ public class ArrayGame {
     /**
      * Set the direction the enemy will move in
      * Loop until all enemies have moved
+     * 
+     * @param map   The current location array
+     * @param rows  The number of rows in the current location array
+     * @param colms The number of collumns in the current location array
      */
     public static void enemyDirection(int[][] map, int rows, int colms) {
         // Locate player
@@ -320,6 +354,12 @@ public class ArrayGame {
 
     /**
      * Move the designated enemy
+     * 
+     * @param map        The current location array
+     * @param row        The row location of the enemy
+     * @param colm       The collumn location of enemy
+     * @param rowChange  The change in the enemy's row location
+     * @param colmChange The change in the enemy's collumn location
      */
     public static void moveEnemy(int[][] map, int row, int colm, int rowChange, int colmChange) {
         // Check if movement is possible
@@ -333,6 +373,9 @@ public class ArrayGame {
 
     /**
      * Check for how many enemies are near the player
+     * 
+     * @param map The current location array
+     * @return The number of enemies near the player
      */
     public static int checkForEnemies(int[][] map) {
         // Near enemies are one space away from the player
@@ -360,6 +403,8 @@ public class ArrayGame {
     /**
      * Get the locations of all nearby enemies
      * 
+     * @param map              The current location array
+     * @param numOfNearEnemies The number of enemies near the player
      * @return Return the locations of all nearby enemies
      */
     public static int[][] nearEnemyLocations(int[][] map, int numOfNearEnemies) {
@@ -399,6 +444,11 @@ public class ArrayGame {
     /**
      * Base functions for battle the scenario
      * Loop until battle is over
+     * 
+     * @param map       The current location array
+     * @param enemyLocs The locations of the nearby enemies
+     * @param enemies   The number of enemies the player is fighting
+     * @throws InterruptedException
      */
     public static void battle(int[][] map, int[][] enemyLocs, int enemies) throws InterruptedException {
         clear();
@@ -487,10 +537,11 @@ public class ArrayGame {
     /**
      * Create arrays for visual effects
      * Loop to change how the images will be printed
-     * @param attackType
-     * @param numOfEnemies
+     * 
+     * @param attackType   The attack the player is using
+     * @param numOfEnemies The number of enemies in the fight
      * @throws InterruptedException
-    */
+     */
     public static void attacks(String attackType, int numOfEnemies) throws InterruptedException {
         String[] enemy = { "<(&)>___  ", "  | (*  );", "   |   \\| ", "  %==<^)  ", "  |   ((  ",
                 "       \\\\ ", "       // " };
@@ -530,11 +581,12 @@ public class ArrayGame {
 
     /**
      * Print sword attack animation
-     * @param player
-     * @param enemy
-     * @param spaceFront
-     * @param spaceBack
-     * @param numOfEnemies
+     * 
+     * @param player       The player image array
+     * @param enemy        The enemy image array
+     * @param spaceFront   The space between the player andd the enemy
+     * @param spaceBack    The space behind the player
+     * @param numOfEnemies The number of enemies in the fight
      */
     public static void printSwordAttack(String player[], String[] enemy, int spaceFront, int spaceBack,
             int numOfEnemies) {
@@ -555,13 +607,14 @@ public class ArrayGame {
 
     /**
      * Print bow and arrow attack animation
-     * @param player
-     * @param enemy
-     * @param arrow
-     * @param distance
-     * @param spaceFront
-     * @param spaceBack
-     * @param numOfEnemies
+     * 
+     * @param player       The player image array
+     * @param enemy        The enemy image array
+     * @param arrow        The arrow image array
+     * @param distance     The total distance between the player and the enemy
+     * @param spaceFront   The space between the arrow and enemy
+     * @param spaceBack    The space between the arrow and the player
+     * @param numOfEnemies The number of enemies in the fight
      */
     public static void printBowAttack(String player[], String[] enemy, String arrow, int distance, int spaceFront,
             int spaceBack, int numOfEnemies) {
@@ -592,10 +645,11 @@ public class ArrayGame {
     /**
      * Print enemy attack animation
      * Add 1 enemy into animation for each alive enemy
-     * @param player
-     * @param enemy
-     * @param spaceFront
-     * @param numOfEnemies
+     * 
+     * @param player       The player image array
+     * @param enemy        The enemy image array
+     * @param spaceFront   The space between the player and enemies
+     * @param numOfEnemies The number of enemies in the fight
      */
     public static void printEnemyAttack(String player[], String[] enemy, int spaceFront,
             int numOfEnemies) {
@@ -621,6 +675,7 @@ public class ArrayGame {
      * Player should be able to select items to use
      * Items in use (sword, bow, etc.) will be in special slots
      * Colours indicate what items are better
+     * 
      * @throws InterruptedException
      */
     public static void inventory() throws InterruptedException {
@@ -663,8 +718,9 @@ public class ArrayGame {
 
     /**
      * Swap the items in the spaces the player specified
-     * @param swapNums
-     * @param catagory
+     * 
+     * @param swapNums The locations that the player want to swap the items in
+     * @param catagory The page of the inventory
      * @throws InterruptedException
      */
     public static void swap(String[] swapNums, int catagory) throws InterruptedException {
@@ -692,6 +748,13 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Convert what the player thinks is an item location to what is actually an
+     * item location
+     * 
+     * @param num The spot the player sees
+     * @return Return the actual location/coordinate
+     */
     public static int[] playerVisualToArrayLocs(String num) {
         int[] itemLoc = new int[2];
         if (num.equals("1") || num.equalsIgnoreCase("one")) {
@@ -734,9 +797,12 @@ public class ArrayGame {
         return itemLoc;
     }
 
+    /**
+     * Print the inventory menu or shop menu
+     * 
+     * @param array The array that is being printed
+     */
     public static void printInventoryAndShop(int[][][] array) {
-        // TODO
-        // Add colours
         for (int i = 0; i < array[0].length; i++) {
             for (int j = 0; j < array[0][0].length; j++) {
                 prt("\033[1;37m");
@@ -809,6 +875,13 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Checks if weapons are in the correct slot
+     * Prevents errors from occuring in battles
+     * 
+     * @return Return true if items are in the correct slots
+     * @throws InterruptedException
+     */
     public static boolean weaponSlotCheck() throws InterruptedException {
         boolean properSlot = true;
         if (playerInventory[0][1][1] != 20 && playerInventory[0][1][1] != 30 && playerInventory[0][1][1] != 50) {
@@ -829,6 +902,11 @@ public class ArrayGame {
         return properSlot;
     }
 
+    /**
+     * Allow player to buy from, flip the page of, or close the shop
+     * 
+     * @throws InterruptedException
+     */
     public static void shop() throws InterruptedException {
         // 3 dimentional shop menu
         // Works similarly to inventory menu
@@ -868,6 +946,13 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Buy function of shop
+     * 
+     * @param shopItems The array of all items in the shop
+     * @param in        The input from the user
+     * @throws InterruptedException
+     */
     public static void buy(int[][][] shopItems, String[] in) throws InterruptedException {
         // Convert the box number the player will read to the actual coordinate
         int[] itemLoc = playerVisualToArrayLocs(in[1]);
@@ -901,47 +986,57 @@ public class ArrayGame {
             canBuy = false;
         }
 
-        // Ask how many items the player would like to buy
-        // Only applies to 2nd page items and arrows
-        int numBought = 1;
-        if (page == 1 || page == 0 && boughtItem == 10 || page == 0 && boughtItem == 15
-                || page == 0 && boughtItem == 25) {
-            prnSlow("How many would you like to buy?");
-            numBought = Integer.parseInt(input.nextLine());
-        }
-
-        int price = costOfItem(boughtItem, numBought);
-        if (price > gold) {
-            canBuy = false;
-        } else {
-            prnSlow("The cost of your items is " + price + " gold");
-            prnSlow("You have " + gold + " gold");
-            prnSlow("Would you like to purchase these items? (y/n)");
-            String choice = input.nextLine();
-
-            if (choice.equalsIgnoreCase("n")) {
-                canBuy = false;
+        // Cancel the rest of the shop options if they already own the item
+        if (canBuy) {
+            // Ask how many items the player would like to buy
+            // Only applies to 2nd page items and arrows
+            int numBought = 1;
+            if (page == 1 || page == 0 && boughtItem == 10 || page == 0 && boughtItem == 15
+                    || page == 0 && boughtItem == 25) {
+                prnSlow("How many would you like to buy?");
+                numBought = Integer.parseInt(input.nextLine());
             }
-        }
 
-        if (canBuy == true) {
-            if (numOfItem == 0) {
-                // Add new item to inventory
-                boolean added = false;
-                for (int i = 1; i < playerInventory[page].length - 1; i++) {
-                    for (int j = 0; j < playerInventory[page][0].length; j++) {
-                        if (playerInventory[page][i][j] == 0 && added == false) {
-                            playerInventory[page][i][j] = boughtItem;
-                            added = true;
+            int price = costOfItem(boughtItem, numBought);
+            if (price > gold) {
+                canBuy = false;
+            } else {
+                prnSlow("The cost of your items is " + price + " gold");
+                prnSlow("You have " + gold + " gold");
+                prnSlow("Would you like to purchase these items? (y/n)");
+                String choice = input.nextLine();
+
+                if (choice.equalsIgnoreCase("n")) {
+                    canBuy = false;
+                }
+            }
+
+            // Check if they still can/want to buy the item before proceeding
+            if (canBuy) {
+                if (numOfItem == 0) {
+                    // Add new item to inventory
+                    boolean added = false;
+                    for (int i = 1; i < playerInventory[page].length - 1; i++) {
+                        for (int j = 0; j < playerInventory[page][0].length; j++) {
+                            if (playerInventory[page][i][j] == 0 && added == false) {
+                                playerInventory[page][i][j] = boughtItem;
+                                added = true;
+                            }
                         }
                     }
                 }
+                changeNumOfItem(boughtItem, numBought);
+                gold -= price;
             }
-            changeNumOfItem(boughtItem, numBought);
-            gold -= price;
         }
     }
 
+    /**
+     * Add the number of items that were bought or used to the counter for the item
+     * 
+     * @param itemDesignation The item they bought or used
+     * @param numBoughtOrUsed The number of items bought or used
+     */
     public static void changeNumOfItem(int itemDesignation, int numBoughtOrUsed) {
         if (page == 0) {
             if (itemDesignation == 10) {
@@ -964,6 +1059,13 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Calculate how much buying the item(s) will cost the player
+     * 
+     * @param itemDesignation The item
+     * @param numBought       The number the player wants to buy
+     * @return Return the cost of the item
+     */
     public static int costOfItem(int itemDesignation, int numBought) {
         int goldToSpend = 0;
         if (page == 0) {
@@ -994,6 +1096,11 @@ public class ArrayGame {
         return goldToSpend * numBought;
     }
 
+    /**
+     * Find what number of item value needs to be changed
+     * 
+     * @param itemName The item the player wants to use
+     */
     public static void useItem(String itemName) {
         // TODO
         // Enable item usage
@@ -1002,6 +1109,12 @@ public class ArrayGame {
         }
     }
 
+    /**
+     * Store arrays for all locations
+     * 
+     * @param name The name of the map that is needed
+     * @return Return the map that corresponds to where the player will be going
+     */
     public static int[][] arrayImages(String name) {
         // Image arrays for the different locations
         if (name.equals("town")) {
