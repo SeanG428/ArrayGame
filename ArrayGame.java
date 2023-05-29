@@ -5,8 +5,8 @@ import java.util.Scanner;
 public class ArrayGame {
     static Scanner input = new Scanner(System.in);
 
-    static int[][] map = arrayImages("dungeonEnd");
-    static String mapName = "dungeonEnd";
+    static int[][] map = arrayImages("town");
+    static String mapName = "town";
 
     static String obstacle = "&";
     static String player = "#";
@@ -179,7 +179,8 @@ public class ArrayGame {
         }
     }
 
-    public static boolean playerMove(int[][] map, int row, int colm, int rowChange, int colmChange) {
+    public static boolean playerMove(int[][] map, int row, int colm, int rowChange, int colmChange)
+            throws InterruptedException {
         // Check if movement is possible
         // If the player is moving into a door, send them to the designated location
 
@@ -549,7 +550,7 @@ public class ArrayGame {
         while (looking) {
             clear();
             prnSlow("Page " + (page + 1) + " of 2");
-            printInventoryAndShop(playerInventory, page);
+            printInventoryAndShop(playerInventory);
             prn("\nValid commands (non case sensitive, must be separated by spaces):");
             prn("- Swap (slot 1) (slot 2)");
             prn("- Flip page");
@@ -586,11 +587,12 @@ public class ArrayGame {
         // Variables to store coordinates of the item and the item number value
         int[][] itemLoc = new int[2][2];
         int[] item = { 0, 0 };
-        // Convert the box number the player will read to the actual coordinate
 
+        // Convert the box number the player will read to the actual coordinate
         for (int i = 0; i < itemLoc.length; i++) {
             itemLoc[i] = playerVisualToArrayLocs(swapNums[i + 1], i);
         }
+
         // Swap the items
         item[0] = playerInventory[catagory][itemLoc[0][0]][itemLoc[0][1]];
         item[1] = playerInventory[catagory][itemLoc[1][0]][itemLoc[1][1]];
@@ -648,69 +650,69 @@ public class ArrayGame {
         return itemLoc;
     }
 
-    public static void printInventoryAndShop(int[][][] array, int catagory) {
+    public static void printInventoryAndShop(int[][][] array) {
         // TODO
         // Add colours
-        for (int i = 0; i < playerInventory[0].length; i++) {
-            for (int j = 0; j < playerInventory[0][0].length; j++) {
-                if (playerInventory[catagory][i][j] == 0) {
+        for (int i = 0; i < array[0].length; i++) {
+            for (int j = 0; j < array[0][0].length; j++) {
+                if (array[page][i][j] == 0) {
                     prt("       ");
-                } else if (playerInventory[catagory][i][j] == -1) {
+                } else if (array[page][i][j] == -1) {
                     prt("-------");
-                } else if (playerInventory[catagory][i][j] == -2) {
+                } else if (array[page][i][j] == -2) {
                     prt("   |   ");
                 }
-                if (catagory == 0) {
+                if (page == 0) {
                     // Weapons
-                    if (playerInventory[catagory][i][j] == 20) {
+                    if (array[page][i][j] == 20) {
                         // Print basic sword
                         // Damage = number
                         prt("   /   ");
-                    } else if (playerInventory[catagory][i][j] == 30) {
+                    } else if (array[page][i][j] == 30) {
                         // Print rare sword
                         // Damage = number
                         prt("   /   ");
-                    } else if (playerInventory[catagory][i][j] == 50) {
+                    } else if (array[page][i][j] == 50) {
                         // Print legendary sword
                         // Damage = number
                         prt("   /   ");
-                    } else if (playerInventory[catagory][i][j] == 1) {
+                    } else if (array[page][i][j] == 1) {
                         // Print basic bow
                         // Bow number multiplies arrow damage by its value
                         prt("   )   ");
-                    } else if (playerInventory[catagory][i][j] == 2) {
+                    } else if (array[page][i][j] == 2) {
                         // Print legendary bow
                         // Bow number multiplies arrow damage by its value
                         prt("   )   ");
-                    } else if (playerInventory[catagory][i][j] == 10) {
+                    } else if (array[page][i][j] == 10) {
                         // Print normal arrow
                         // Arrow damage = number
-                        prt("  >  :" + numOfNormalArrows);
-                    } else if (playerInventory[catagory][i][j] == 15) {
+                        prt("  > : " + numOfNormalArrows);
+                    } else if (array[page][i][j] == 15) {
                         // Print sharp arrow
                         // Arrow damage = number
-                        prt("  >  :" + numOfSharpArrows);
-                    } else if (playerInventory[catagory][i][j] == 25) {
+                        prt("  > : " + numOfSharpArrows);
+                    } else if (array[page][i][j] == 25) {
                         // Print explosive arrow
                         // Arrow damage = number
-                        prt("  >  :" + numOfExplosiveArrows);
+                        prt("  > : " + numOfExplosiveArrows);
                     }
                 } else {
                     // Heals
                     // Number represents how much it heals the player by
-                    if (playerInventory[catagory][i][j] == 10) {
+                    if (array[page][i][j] == 10) {
                         // Print small heal
-                        prt("  .  :" + numOfSmallHeals);
-                    } else if (playerInventory[catagory][i][j] == 20) {
+                        prt(" .  : " + numOfSmallHeals);
+                    } else if (array[page][i][j] == 20) {
                         // Print medium heal
-                        prt("  O  :" + numOfMediumHeals);
-                    } else if (playerInventory[catagory][i][j] == 30) {
+                        prt(" O  : " + numOfMediumHeals);
+                    } else if (array[page][i][j] == 30) {
                         // Print large heal
-                        prt(" (_) :" + numOfLargeHeals);
-                    } else if (playerInventory[catagory][i][j] == 5) {
+                        prt("(_) : " + numOfLargeHeals);
+                    } else if (array[page][i][j] == 5) {
                         // Print suspicious heal
                         // Using this item may make the user lose health
-                        prt(" _'- :" + numOfSuspiciousHeals);
+                        prt("_'- : " + numOfSuspiciousHeals);
                     }
                 }
             }
@@ -738,7 +740,7 @@ public class ArrayGame {
         return properSlot;
     }
 
-    public static void shop() {
+    public static void shop() throws InterruptedException {
         // TODO
         // Create shop
         clear();
@@ -754,7 +756,7 @@ public class ArrayGame {
 
         boolean done = false;
         while (!done) {
-            printInventoryAndShop(shopItems, page);
+            printInventoryAndShop(shopItems);
 
             prnSlow("What would you like to buy? (non-case sensitive)");
             prnSlow("- Flip page");
@@ -770,34 +772,131 @@ public class ArrayGame {
                     page = 0;
                 }
             } else if (selection[0].equalsIgnoreCase("buy")) {
-                buy(shopItems, selection);
+                int buyNum = 1;
+                if (page == 1) {
+                    prnSlow("How many would you like to buy?");
+                    buyNum = Integer.parseInt(input.nextLine());
+                }
+                buy(shopItems, selection, buyNum);
             } else if (selection[0].equalsIgnoreCase("close")) {
                 done = true;
             }
         }
     }
 
-    public static void buy(int[][][] shopItems, String[] in) {
-        int[] itemLoc = playerVisualToArrayLocs(in);
+    public static void buy(int[][][] shopItems, String[] in, int numBought) throws InterruptedException {
+        // Convert the box number the player will read to the actual coordinate
+        int[] itemLoc = playerVisualToArrayLocs(in[1]);
+
         int boughtItem = 0;
+        boolean canBuy = true;
 
         // Determine number value of the bought item
-        for (int i = 0; i < shopItems[page][0].length; i++) {
-            for (int j = 0; j < shopItems[page][0][0].length; j++) {
+        for (int i = 0; i < shopItems[page].length; i++) {
+            for (int j = 0; j < shopItems[page][0].length; j++) {
                 if (i == itemLoc[0] && j == itemLoc[1]) {
                     boughtItem = shopItems[page][i][j];
                 }
             }
         }
 
-        // Add new item to inventory
+        int numOfItem = 0;
+        // Check if the player already has the item
         for (int i = 0; i < playerInventory[page].length; i++) {
             for (int j = 0; j < playerInventory[page][0].length; j++) {
-                if (playerInventory[page][i][j] == 0) {
-                    playerInventory[page][i][j] = boughtItem;
+                if (playerInventory[page][i][j] == boughtItem) {
+                    numOfItem++;
                 }
             }
         }
+
+        // Items on first page can only be bought once
+        if (page == 0 && numOfItem > 0) {
+            canBuy = false;
+        }
+
+        // Ask how many items the player would like to buy
+        // Only applies to 2nd page items
+        if (page == 1 || page == 0 && boughtItem == 10 || page == 0 && boughtItem == 15
+                || page == 0 && boughtItem == 25) {
+        }
+
+        int price = costOfItem(boughtItem, numBought);
+        if (price > gold) {
+            canBuy = false;
+        } else {
+            prnSlow("The cost of your items is " + price + " gold");
+            prnSlow("You have " + gold + " gold");
+            prnSlow("Would you like to purchase these items? (y/n)");
+            String choice = input.nextLine();
+
+            if (choice.equalsIgnoreCase("n")) {
+                canBuy = false;
+            }
+        }
+
+        if (canBuy == true) {
+            if (numOfItem == 0) {
+                // Add new item to inventory
+                for (int i = 0; i < playerInventory[page].length; i++) {
+                    for (int j = 0; j < playerInventory[page][0].length; j++) {
+                        if (playerInventory[page][i][j] == 0) {
+                            playerInventory[page][i][j] = boughtItem;
+                        }
+                    }
+                }
+            }
+            changeNumOfItem(boughtItem, numBought);
+            gold -= price;
+        }
+    }
+
+    public static void changeNumOfItem(int itemDesignation, int numBoughtOrUsed) {
+        if (page == 0) {
+            if (itemDesignation == 10) {
+                numOfNormalArrows += numBoughtOrUsed;
+            } else if (itemDesignation == 15) {
+                numOfSharpArrows += numBoughtOrUsed;
+            } else if (itemDesignation == 25) {
+                numOfExplosiveArrows += numBoughtOrUsed;
+            }
+        } else {
+            if (itemDesignation == 10) {
+                numOfSmallHeals += numBoughtOrUsed;
+            } else if (itemDesignation == 20) {
+                numOfMediumHeals += numBoughtOrUsed;
+            } else if (itemDesignation == 30) {
+                numOfLargeHeals += numBoughtOrUsed;
+            }
+        }
+    }
+
+    public static int costOfItem(int itemDesignation, int numBought) {
+        int goldToSpend = 0;
+        if (page == 0) {
+            if (itemDesignation == 30) {
+                goldToSpend = 100;
+            } else if (itemDesignation == 50) {
+                goldToSpend = 200;
+            } else if (itemDesignation == 2) {
+                goldToSpend = 150;
+            } else if (itemDesignation == 10) {
+                goldToSpend = 10;
+            } else if (itemDesignation == 15) {
+                goldToSpend = 15;
+            } else if (itemDesignation == 25) {
+                goldToSpend = 20;
+            }
+        } else {
+            if (itemDesignation == 10) {
+                goldToSpend = 10;
+            } else if (itemDesignation == 20) {
+                goldToSpend = 20;
+            } else if (itemDesignation == 30) {
+                goldToSpend = 30;
+            }
+        }
+        return goldToSpend * numBought;
     }
 
     public static int[][] arrayImages(String name) {
