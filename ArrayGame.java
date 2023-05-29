@@ -370,7 +370,7 @@ public class ArrayGame {
         // Set enemy health
         int[] enemyHealth = new int[enemies];
         for (int i = 0; i < enemies; i++) {
-            enemyHealth[i] = 0;
+            enemyHealth[i] = 50;
         }
 
         int enemiesLeft = enemies;
@@ -536,15 +536,13 @@ public class ArrayGame {
     }
 
     public static void inventory() throws InterruptedException {
-        // TODO
-        // Create inventory array (3 dimentional)
+        // 3 dimentional inventory menu
         // First dimention: type/catagory (0: Weapons, 1: Heals)
         // Second dimention: row
         // Third dimention: collumn
         // Player should be able to organise their inventory (swap)
         // Items can only be swapped with other items in their catagory
         // Player should be able to select items to use
-        // Inventory should automatically shift items over when a slot is empty
         // Items in use (sword, bow, etc.) will be in special slots
         // Colours indicate what items are better
 
@@ -743,8 +741,8 @@ public class ArrayGame {
     }
 
     public static void shop() throws InterruptedException {
-        // TODO
-        // Create shop
+        // 3 dimentional shop menu
+        // Works similarly to inventory menu
         clear();
         int[][][] shopItems = {
                 { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 30, -2, 50, -2, 0, -2, 0, -2, },
@@ -809,7 +807,8 @@ public class ArrayGame {
 
         // Items on first page can only be bought once
         // This excludes arrows
-        if (page == 0 && numOfItem > 0 && boughtItem == 30 || page == 0 && numOfItem > 0 && boughtItem == 50 || page == 0 && numOfItem > 0 && boughtItem == 2) {
+        if (page == 0 && numOfItem > 0 && boughtItem == 30 || page == 0 && numOfItem > 0 && boughtItem == 50
+                || page == 0 && numOfItem > 0 && boughtItem == 2) {
             canBuy = false;
         }
 
