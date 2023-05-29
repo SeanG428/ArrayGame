@@ -23,23 +23,23 @@ public class ArrayGame {
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 0, -2, 0, -2, 0, -2 },
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
-            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 10, -2, 20, -2, 30, -2, 0, -2 },
+            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
 
     static int page = 0;
 
-    // See if the user can close the inventory
+    // Used to see if the user can close the inventory
     static boolean canClose = true;
 
     static int gold = 100;
-    static int numOfNormalArrows = 0;
+    static int numOfNormalArrows = 10;
     static int numOfSharpArrows = 0;
     static int numOfExplosiveArrows = 0;
-    static int numOfSmallHeals = 9;
-    static int numOfMediumHeals = 9;
-    static int numOfLargeHeals = 9;
+    static int numOfSmallHeals = 0;
+    static int numOfMediumHeals = 0;
+    static int numOfLargeHeals = 0;
     static int numOfSuspiciousHeals = 0;
 
     /**
@@ -72,11 +72,12 @@ public class ArrayGame {
 
             int numOfNearEnemies = checkForEnemies(map);
             if (numOfNearEnemies > 0) {
-                battle(map, nearEnemyLocations(map, numOfNearEnemies), numOfNearEnemies);
+                done = battle(map, nearEnemyLocations(map, numOfNearEnemies), numOfNearEnemies);
                 clear();
                 printLocationArray(map, map.length, map[0].length);
             }
         }
+        prn("You Died");
     }
 
     /**
@@ -376,9 +377,11 @@ public class ArrayGame {
      * @param map       The current location array
      * @param enemyLocs The locations of the nearby enemies
      * @param enemies   The number of enemies the player is fighting
+     * @return Return true if the player is out of health to end the game and false
+     *         if the player has health left to continue it
      * @throws InterruptedException
      */
-    public static void battle(int[][] map, int[][] enemyLocs, int enemies) throws InterruptedException {
+    public static boolean battle(int[][] map, int[][] enemyLocs, int enemies) throws InterruptedException {
         clear();
         if (enemies > 1) {
             prnSlow("You've encountered " + enemies + " enemies");
@@ -434,10 +437,9 @@ public class ArrayGame {
                     enemyHealth[choice] -= playerInventory[0][1][1];
                     attacked = true;
                 } else if (selection == 2) {
-                    int arrowNum = itemDesignation(playerInventory, "9");
-
-                    if (arrowNum == 10 && numOfNormalArrows != 0 || arrowNum == 15 && numOfSharpArrows != 0
-                            || arrowNum == 25 && numOfExplosiveArrows != 0) {
+                    int arrowNum = itemDesignation(playerInventory, "9", 0);
+                    int numOfArrows = numOfSpecifiedItem(arrowNum, 0);
+                    if (numOfArrows > 0) {
                         attacks("bow", enemiesLeft);
                         for (int j = 0; j < enemiesLeft; j++) {
                             enemyHealth[j] -= playerInventory[0][3][1] * playerInventory[0][5][1];
@@ -452,6 +454,7 @@ public class ArrayGame {
                     inventory();
                 }
             }
+
             // Check if there are any enemies left
             for (int i = 0; i < enemyLocs.length; i++) {
                 if (enemyHealth[i] <= 0) {
@@ -473,8 +476,14 @@ public class ArrayGame {
                     playerHealth -= 10;
                 }
             }
+
+            // Check if the player is still alive
+            if (playerHealth <= 0) {
+                return true;
+            }
         }
         rewards(enemies);
+        return false;
     }
 
     /**
@@ -691,18 +700,48 @@ public class ArrayGame {
      * @param playerVisual The box number/location the player will assume
      * @return Return the number value of the item
      */
-    public static int itemDesignation(int[][][] itemArray, String playerVisual) {
+    public static int itemDesignation(int[][][] itemArray, String playerVisual, int catagory) {
         // Convert the box number the player will read to the actual coordinate
         int[] itemLoc = playerVisualToArrayLocs(playerVisual);
         int itemNumberValue = 0;
-        for (int i = 0; i < itemArray[page].length; i++) {
-            for (int j = 0; j < itemArray[page][0].length; j++) {
+        for (int i = 0; i < itemArray[catagory].length; i++) {
+            for (int j = 0; j < itemArray[catagory][0].length; j++) {
                 if (i == itemLoc[0] && j == itemLoc[1]) {
-                    itemNumberValue = itemArray[page][i][j];
+                    itemNumberValue = itemArray[catagory][i][j];
                 }
             }
         }
         return itemNumberValue;
+    }
+
+    /**
+     * Determine how much of an item the player has
+     * 
+     * @param itemNumberValue The item's number designation
+     * @return Return the number of an item in the inventory
+     */
+    public static int numOfSpecifiedItem(int itemNumberValue, int catagory) {
+        int numOfItem = 0;
+        if (catagory == 0) {
+            if (itemNumberValue == 10) {
+                numOfItem = numOfNormalArrows;
+            } else if (itemNumberValue == 15) {
+                numOfItem = numOfSharpArrows;
+            } else if (itemNumberValue == 25) {
+                numOfItem = numOfExplosiveArrows;
+            }
+        } else {
+            if (itemNumberValue == 10) {
+                numOfItem = numOfSmallHeals;
+            } else if (itemNumberValue == 20) {
+                numOfItem = numOfMediumHeals;
+            } else if (itemNumberValue == 30) {
+                numOfItem = numOfLargeHeals;
+            } else if (itemNumberValue == 5) {
+                numOfItem = numOfSuspiciousHeals;
+            }
+        }
+        return numOfItem;
     }
 
     /**
@@ -822,18 +861,25 @@ public class ArrayGame {
      * @param itemSlot The slot that the item the player wants to use is in
      */
     public static void useItem(String itemSlot) throws InterruptedException {
+        int itemValue = itemDesignation(playerInventory, itemSlot, 1);
+        int numOfHeals = numOfSpecifiedItem(itemValue, 1);
         if (playerHealth < 100) {
-            int itemValue = itemDesignation(playerInventory, itemSlot);
-            if (itemValue > 5) {
-                playerHealth += itemValue;
-            } else {
-                int randomNumber = (int) (2 * Math.random());
-                if (randomNumber == 0)
+            if (numOfHeals != 0) {
+                if (itemValue > 5) {
                     playerHealth += itemValue;
-                else if (randomNumber == 1)
-                    playerHealth -= itemValue;
+                } else {
+                    int randomNumber = (int) (2 * Math.random());
+                    if (randomNumber == 0)
+                        playerHealth += itemValue;
+                    else if (randomNumber == 1)
+                        playerHealth -= itemValue;
+                }
+                changeNumOfItem(itemValue, -1, 1);
+            } else {
+                prnSlow("You are out of this type of heal");
             }
-            changeNumOfItem(itemValue, -1, 1);
+        } else {
+            prnSlow("You are already at max health");
         }
         // Check if the player's health went over the maximum value
         if (playerHealth > 100) {
@@ -897,7 +943,7 @@ public class ArrayGame {
     public static void buy(int[][][] shopItems, String[] in) throws InterruptedException {
         boolean canBuy = true;
 
-        int boughtItem = itemDesignation(shopItems, in[1]);
+        int boughtItem = itemDesignation(shopItems, in[1], page);
 
         int numOfItem = 0;
         // Check if the player already has the item
