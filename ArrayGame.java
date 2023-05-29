@@ -113,9 +113,9 @@ public class ArrayGame {
                 } else if (array[i][j] == 1) {
                     prt(" & ");
                 } else if (array[i][j] == 2) {
-                    prt(" # ");
+                    prt("\033[0;32m # \033[0m");
                 } else if (array[i][j] == 3) {
-                    prt(" ! ");
+                    prt("\033[0;31m ! \033[0m");
                 } else if (array[i][j] == 4) {
                     prt("---");
                 } else if (array[i][j] == 5) {
@@ -655,6 +655,7 @@ public class ArrayGame {
         // Add colours
         for (int i = 0; i < array[0].length; i++) {
             for (int j = 0; j < array[0][0].length; j++) {
+                prt("\033[1;37m");
                 if (array[page][i][j] == 0) {
                     prt("       ");
                 } else if (array[page][i][j] == -1) {
@@ -662,6 +663,7 @@ public class ArrayGame {
                 } else if (array[page][i][j] == -2) {
                     prt("   |   ");
                 }
+                prt("\033[0m");
                 if (page == 0) {
                     // Weapons
                     if (array[page][i][j] == 20) {
@@ -671,11 +673,11 @@ public class ArrayGame {
                     } else if (array[page][i][j] == 30) {
                         // Print rare sword
                         // Damage = number
-                        prt("   /   ");
+                        prt("\033[0;34m   /   ");
                     } else if (array[page][i][j] == 50) {
                         // Print legendary sword
                         // Damage = number
-                        prt("   /   ");
+                        prt("\033[0;33m   /   ");
                     } else if (array[page][i][j] == 1) {
                         // Print basic bow
                         // Bow number multiplies arrow damage by its value
@@ -683,7 +685,7 @@ public class ArrayGame {
                     } else if (array[page][i][j] == 2) {
                         // Print legendary bow
                         // Bow number multiplies arrow damage by its value
-                        prt("   )   ");
+                        prt("\033[0;33m   )   ");
                     } else if (array[page][i][j] == 10) {
                         // Print normal arrow
                         // Arrow damage = number
@@ -691,15 +693,17 @@ public class ArrayGame {
                     } else if (array[page][i][j] == 15) {
                         // Print sharp arrow
                         // Arrow damage = number
-                        prt("  > : " + numOfSharpArrows);
+                        prt("\033[0;34m  > : " + numOfSharpArrows);
                     } else if (array[page][i][j] == 25) {
                         // Print explosive arrow
                         // Arrow damage = number
-                        prt("  > : " + numOfExplosiveArrows);
+                        prt("\033[0;33m  > : " + numOfExplosiveArrows);
                     }
+                    prt("\033[0m");
                 } else {
                     // Heals
                     // Number represents how much it heals the player by
+                    prt("\033[0;34m");
                     if (array[page][i][j] == 10) {
                         // Print small heal
                         prt(" .  : " + numOfSmallHeals);
@@ -712,8 +716,9 @@ public class ArrayGame {
                     } else if (array[page][i][j] == 5) {
                         // Print suspicious heal
                         // Using this item may make the user lose health
-                        prt("_'- : " + numOfSuspiciousHeals);
+                        prt("\033[0;32m_'- : " + numOfSuspiciousHeals);
                     }
+                    prt("\033[0m");
                 }
             }
             prn("");
@@ -745,11 +750,11 @@ public class ArrayGame {
         // Works similarly to inventory menu
         clear();
         int[][][] shopItems = {
-                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 30, -2, 50, -2, 0, -2, 0, -2, },
-                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 2, -2, 0, -2, 0, -2, 0, -2 },
+                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 30, -2, 50, -2, 0, -2, },
+                        { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 2, -2, 0, -2 },
                         { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 15, -2, 25, -2, 0, -2 },
                         { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
-                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 10, -2, 20, -2, 30, -2, 0, -2 },
+                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 10, -2, 20, -2, 30, -2, 5, -2 },
                         { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                         { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                         { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
@@ -869,6 +874,8 @@ public class ArrayGame {
                 numOfMediumHeals += numBoughtOrUsed;
             } else if (itemDesignation == 30) {
                 numOfLargeHeals += numBoughtOrUsed;
+            } else if (itemDesignation == 5) {
+                numOfSuspiciousHeals += numBoughtOrUsed;
             }
         }
     }
@@ -896,6 +903,8 @@ public class ArrayGame {
                 goldToSpend = 20;
             } else if (itemDesignation == 30) {
                 goldToSpend = 30;
+            } else if (itemDesignation == 5) {
+                goldToSpend = 0;
             }
         }
         return goldToSpend * numBought;
