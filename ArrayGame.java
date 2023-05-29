@@ -17,7 +17,7 @@ public class ArrayGame {
 
     static int test = 17;
 
-    static int playerHealth = 100;
+    static int playerHealth = 100000;
 
     static int[][][] playerInventory = {
             { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, },
@@ -54,6 +54,9 @@ public class ArrayGame {
         // Use locations to make enemies move towards player
         // Player moves with w, a, s, d, x input
         // Enemies move after player
+
+        // TODO
+        // fix blank screen after closing inventory
 
         boolean done = false;
 
@@ -162,6 +165,8 @@ public class ArrayGame {
         boolean moved = false;
 
         while (!moved) {
+            clear();
+            printArray(map, map.length, map[0].length);
             String direction = input.nextLine();
             if (direction.equalsIgnoreCase("a")) {
                 moved = playerMove(map, currentPlayerLoc[0], currentPlayerLoc[1], 0, -1);
@@ -838,10 +843,12 @@ public class ArrayGame {
         if (canBuy == true) {
             if (numOfItem == 0) {
                 // Add new item to inventory
-                for (int i = 0; i < playerInventory[page].length; i++) {
+                boolean added = false;
+                for (int i = 1; i < playerInventory[page].length - 1; i++) {
                     for (int j = 0; j < playerInventory[page][0].length; j++) {
-                        if (playerInventory[page][i][j] == 0) {
+                        if (playerInventory[page][i][j] == 0 && added == false) {
                             playerInventory[page][i][j] = boughtItem;
+                            added = true;
                         }
                     }
                 }
