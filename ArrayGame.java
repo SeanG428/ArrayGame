@@ -491,7 +491,7 @@ public class ArrayGame {
             prnSlow("You now have " + gold + " gold");
             // Suspicious heals
             int chanceOfHeals = (int) (3 * Math.random());
-            //if (chanceOfHeals == 0) {
+            if (chanceOfHeals == 0) {
                 int suspiciousHealsFound = (int) (5 * Math.random() + 1);
                 if (numOfSuspiciousHeals == 0) {
                     addItemToInventory(5, 1);
@@ -499,7 +499,7 @@ public class ArrayGame {
                 changeNumOfItem(5, suspiciousHealsFound, 1);
                 prnSlow("You found " + suspiciousHealsFound + " suspicious heals");
                 prnSlow("You now have " + numOfSuspiciousHeals + " suspicious heals");
-            //}
+            }
             Thread.sleep(1000);
         }
     }
