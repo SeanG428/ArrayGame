@@ -17,7 +17,7 @@ public class ArrayGame {
 
     static int test = 17;
 
-    static int playerHealth = 100000;
+    static int playerHealth = 100;
 
     static int[][][] playerInventory = {
             { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, },
@@ -35,7 +35,7 @@ public class ArrayGame {
 
     static boolean canClose = true;
 
-    static int gold = 100;
+    static int gold = 100000;
     static int numOfNormalArrows = 0;
     static int numOfSharpArrows = 0;
     static int numOfExplosiveArrows = 0;
@@ -54,9 +54,6 @@ public class ArrayGame {
         // Use locations to make enemies move towards player
         // Player moves with w, a, s, d, x input
         // Enemies move after player
-
-        // TODO
-        // fix blank screen after closing inventory
 
         boolean done = false;
 
@@ -595,7 +592,7 @@ public class ArrayGame {
 
         // Convert the box number the player will read to the actual coordinate
         for (int i = 0; i < itemLoc.length; i++) {
-            itemLoc[i] = playerVisualToArrayLocs(swapNums[i + 1], i);
+            itemLoc[i] = playerVisualToArrayLocs(swapNums[i + 1]);
         }
 
         // Swap the items
@@ -777,19 +774,14 @@ public class ArrayGame {
                     page = 0;
                 }
             } else if (selection[0].equalsIgnoreCase("buy")) {
-                int buyNum = 1;
-                if (page == 1) {
-                    prnSlow("How many would you like to buy?");
-                    buyNum = Integer.parseInt(input.nextLine());
-                }
-                buy(shopItems, selection, buyNum);
+                buy(shopItems, selection);
             } else if (selection[0].equalsIgnoreCase("close")) {
                 done = true;
             }
         }
     }
 
-    public static void buy(int[][][] shopItems, String[] in, int numBought) throws InterruptedException {
+    public static void buy(int[][][] shopItems, String[] in) throws InterruptedException {
         // Convert the box number the player will read to the actual coordinate
         int[] itemLoc = playerVisualToArrayLocs(in[1]);
 
@@ -822,8 +814,11 @@ public class ArrayGame {
 
         // Ask how many items the player would like to buy
         // Only applies to 2nd page items
+        int numBought = 1;
         if (page == 1 || page == 0 && boughtItem == 10 || page == 0 && boughtItem == 15
                 || page == 0 && boughtItem == 25) {
+            prnSlow("How many would you like to buy?");
+            numBought = Integer.parseInt(input.nextLine());
         }
 
         int price = costOfItem(boughtItem, numBought);
