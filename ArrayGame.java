@@ -52,12 +52,13 @@ public class ArrayGame {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
+        clear();
+        instructions();
 
         boolean done = false;
 
         map[10][8] = playerValue;
 
-        clear();
         printLocationArray(map, map.length, map[0].length);
 
         while (!done) {
@@ -66,18 +67,49 @@ public class ArrayGame {
             if (mapName.equals("dungeonStart") || mapName.equals("dungeonMiddle") || mapName.equals("dungeonEnd"))
                 enemyDirection(map, map.length, map[0].length);
 
-            clear();
             printLocationArray(map, map.length, map[0].length);
             Thread.sleep(500);
 
             int numOfNearEnemies = checkForEnemies(map);
             if (numOfNearEnemies > 0) {
                 done = battle(map, nearEnemyLocations(map, numOfNearEnemies), numOfNearEnemies);
-                clear();
                 printLocationArray(map, map.length, map[0].length);
             }
         }
         prn("You Died");
+    }
+
+    public static void instructions() throws InterruptedException{
+        prnSlow("Welcome to Cave Dwellers!");
+        nextInstructionPrep();
+        prnSlow("In this game, there is no main objective.");
+        prnSlow("You may do as you wish and fight monsters as you please.");
+        nextInstructionPrep();
+
+        prnSlow("You can move your character by using the following inputs:");
+        prnSlow("w) Move up");
+        prnSlow("x) Move down");
+        prnSlow("a) Move left");
+        prnSlow("d) Move right");
+        prnSlow("s) Stay where you are");
+        nextInstructionPrep();
+
+        prnSlow("You may also access your inventory by pressing i.");
+        nextInstructionPrep();
+
+        prnSlow("When given directions for input, it is very important to follow them.");
+        nextInstructionPrep();
+
+        prnSlow("Enjoy playing Cave Dwellers!");
+        nextInstructionPrep();
+    }
+
+    /**
+     * Give the user time to read the instructions
+     */
+    public static void nextInstructionPrep() throws InterruptedException {
+        Thread.sleep(1000);
+        clear();
     }
 
     /**
@@ -116,7 +148,6 @@ public class ArrayGame {
         boolean moved = false;
 
         while (!moved) {
-            clear();
             printLocationArray(map, map.length, map[0].length);
             String direction = input.nextLine();
             if (direction.equalsIgnoreCase("a")) {
@@ -162,7 +193,6 @@ public class ArrayGame {
             doors("healersLodge", 15, 8);
 
             // Restore health when the player enters the healers lodge
-            clear();
             printLocationArray(map, map.length, map[0].length);
 
             prnSlow("Your health has been restored");
@@ -1167,6 +1197,7 @@ public class ArrayGame {
      * @param colms The number of collumns in the array
      */
     public static void printLocationArray(int array[][], int rows, int colms) {
+        clear();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < colms; j++) {
                 if (array[i][j] == 0) {
