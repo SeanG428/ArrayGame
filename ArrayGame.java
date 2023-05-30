@@ -3,6 +3,9 @@ package ArrayGame;
 import java.util.Scanner;
 
 public class ArrayGame {
+    // TODO in later versions
+    // Add boss fight
+    // Add more functions to prevent incorrect input from breaking the game
     static Scanner input = new Scanner(System.in);
 
     static int[][] map = arrayImages("town");
