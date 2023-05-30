@@ -8,34 +8,37 @@ public class ArrayGame {
     // Add more functions to prevent incorrect input from breaking the game
     static Scanner input = new Scanner(System.in);
 
+    // Starting map
     static int[][] map = arrayImages("town");
     static String mapName = "town";
 
+    // Important character symbols
     static String obstacle = "&";
     static String player = "#";
     static String enemy = "!";
 
+    // Important character number values
     static int obstacleValue = 1;
     static int playerValue = 2;
     static int enemyValue = 3;
-
-    static int playerHealth = 100;
 
     static int[][][] playerInventory = {
             { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 0, -2, 0, -2, 0, -2 },
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
-            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 0, -2, 0, -2, 5, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
 
+    // Page of inventory or shop
     static int page = 0;
 
     // Used to see if the user can close the inventory
     static boolean canClose = true;
 
+    static int playerHealth = 5;
     static int gold = 100;
     static int numOfNormalArrows = 10;
     static int numOfSharpArrows = 0;
@@ -43,7 +46,7 @@ public class ArrayGame {
     static int numOfSmallHeals = 0;
     static int numOfMediumHeals = 0;
     static int numOfLargeHeals = 0;
-    static int numOfSuspiciousHeals = 0;
+    static int numOfSuspiciousHeals = 50;
 
     /**
      * PLAN FOR GAME:
@@ -56,18 +59,18 @@ public class ArrayGame {
      */
     public static void main(String[] args) throws Exception {
         clear();
-        instructions();
+        // instructions();
 
-        boolean done = false;
-
+        // Spawn player
         map[10][8] = playerValue;
 
         printLocationArray(map, map.length, map[0].length);
 
+        boolean done = false;
         while (!done) {
             playerDirection(map);
 
-            if (mapName.equals("dungeonStart") || mapName.equals("dungeonMiddle") || mapName.equals("dungeonEnd"))
+            if (mapName.equals("dungeonStart") || mapName.equals("dungeonMiddle"))
                 enemyDirection(map, map.length, map[0].length);
 
             printLocationArray(map, map.length, map[0].length);
@@ -75,14 +78,17 @@ public class ArrayGame {
 
             int numOfNearEnemies = checkForEnemies(map);
             if (numOfNearEnemies > 0) {
-                done = battle(map, nearEnemyLocations(map, numOfNearEnemies), numOfNearEnemies);
+                battle(map, nearEnemyLocations(map, numOfNearEnemies), numOfNearEnemies);
                 printLocationArray(map, map.length, map[0].length);
             }
+            if (playerDied()) {
+                done = true;
+            }
         }
-        prn("You Died");
+        prn("\u001B[31mYou Died\033[0m");
     }
 
-    public static void instructions() throws InterruptedException{
+    public static void instructions() throws InterruptedException {
         prnSlow("Welcome to Cave Dwellers!");
         nextInstructionPrep();
         prnSlow("In this game, there is no main objective.");
@@ -166,6 +172,10 @@ public class ArrayGame {
                 moved = true;
             } else if (direction.equalsIgnoreCase("i")) {
                 inventory();
+                // Check if the player died from suspiciousHeals
+                if (playerDied()) {
+                    moved = true;
+                }
             }
         }
     }
@@ -415,7 +425,7 @@ public class ArrayGame {
      *         if the player has health left to continue it
      * @throws InterruptedException
      */
-    public static boolean battle(int[][] map, int[][] enemyLocs, int enemies) throws InterruptedException {
+    public static void battle(int[][] map, int[][] enemyLocs, int enemies) throws InterruptedException {
         clear();
         if (enemies > 1) {
             prnSlow("You've encountered " + enemies + " enemies");
@@ -486,38 +496,54 @@ public class ArrayGame {
                     }
                 } else {
                     inventory();
+                    // Check if player died from using suspicious heals
+                    if (playerDied()) {
+                        attacked = true;
+                    }
                 }
             }
 
-            // Check if there are any enemies left
-            for (int i = 0; i < enemyLocs.length; i++) {
-                if (enemyHealth[i] <= 0) {
-                    defeatedEnemies++;
-                    enemyHealth[i] = 0;
-                }
-            }
-            enemiesLeft = enemies - defeatedEnemies;
-            // End fight if there are no enemies
-            if (enemiesLeft == 0) {
-                // Delete defeated enemies from map
+            // If the player is still alive, have enemies attack
+            if (playerDied() == false) {
+                // Check if there are any enemies left
                 for (int i = 0; i < enemyLocs.length; i++) {
-                    map[enemyLocs[i][0]][enemyLocs[i][1]] = 0;
+                    if (enemyHealth[i] <= 0) {
+                        defeatedEnemies++;
+                        enemyHealth[i] = 0;
+                    }
                 }
-                fighting = false;
+                enemiesLeft = enemies - defeatedEnemies;
+                // End fight if there are no enemies
+                if (enemiesLeft == 0) {
+                    // Delete defeated enemies from map
+                    for (int i = 0; i < enemyLocs.length; i++) {
+                        map[enemyLocs[i][0]][enemyLocs[i][1]] = 0;
+                    }
+                    fighting = false;
+                    rewards(enemies);
+                } else {
+                    attacks("enemy", enemiesLeft);
+                    for (int i = 0; i < enemiesLeft; i++) {
+                        playerHealth -= 10;
+                    }
+                }
             } else {
-                attacks("enemy", enemiesLeft);
-                for (int i = 0; i < enemiesLeft; i++) {
-                    playerHealth -= 10;
-                }
-            }
-
-            // Check if the player is still alive
-            if (playerHealth <= 0) {
-                return true;
+                fighting = false;
             }
         }
-        rewards(enemies);
-        return false;
+    }
+
+    /**
+     * Check if the player ran out of health
+     * 
+     * @return Return true if the player is out of health
+     */
+    public static boolean playerDied() {
+        boolean died = false;
+        if (playerHealth <= 0) {
+            died = true;
+        }
+        return died;
     }
 
     /**
@@ -806,7 +832,7 @@ public class ArrayGame {
             prn("- Close");
             String[] command = (input.nextLine()).split(" ");
 
-            if (command[0].equalsIgnoreCase("swap")) {
+            if (command[0].equalsIgnoreCase("swap") && command.length == 3) {
                 // Swap
                 swap(command, page);
             } else if (command[0].equalsIgnoreCase("flip")) {
@@ -816,15 +842,21 @@ public class ArrayGame {
                 } else {
                     page = 1;
                 }
-            } else if (command[0].equalsIgnoreCase("use") && page == 1) {
+            } else if (command[0].equalsIgnoreCase("use") && page == 1 && command.length == 2) {
                 // Use item
                 useItem(command[1]);
+                // Check if player died from using a suspicious heal
+                if (playerDied()) {
+                    looking = false;
+                }
             } else if (command[0].equalsIgnoreCase("close") && canClose == true) {
                 // Close inventory menu
                 looking = false;
-            } else {
+            } else if (command[0].equalsIgnoreCase("close") && canClose == false) {
                 prnSlow("You may not close the inventory unless all items are in the correct slots.");
                 Thread.sleep(1000);
+            } else {
+                prnSlow("That input is not recognized");
             }
         }
         clear();
@@ -897,11 +929,11 @@ public class ArrayGame {
     public static void useItem(String itemSlot) throws InterruptedException {
         int itemValue = itemDesignation(playerInventory, itemSlot, 1);
         int numOfHeals = numOfSpecifiedItem(itemValue, 1);
-        if (playerHealth < 100) {
+        if (playerHealth < 100 && playerDied() == false) {
             if (numOfHeals != 0) {
-                if (itemValue > 5) {
+                if (itemValue > 5) { // Normal heals
                     playerHealth += itemValue;
-                } else {
+                } else { // Suspicious heals
                     int randomNumber = (int) (2 * Math.random());
                     if (randomNumber == 0)
                         playerHealth += itemValue;
@@ -909,18 +941,19 @@ public class ArrayGame {
                         playerHealth -= itemValue;
                 }
                 changeNumOfItem(itemValue, -1, 1);
+
+                // Check if the player's health went over the maximum value
+                if (playerHealth > 100) {
+                    playerHealth = 100;
+                }
+                prnSlow("You have " + playerHealth + " health points");
+                Thread.sleep(200);
             } else {
                 prnSlow("You are out of this type of heal");
             }
-        } else {
+        } else if (playerHealth == 100) {
             prnSlow("You are already at max health");
         }
-        // Check if the player's health went over the maximum value
-        if (playerHealth > 100) {
-            playerHealth = 100;
-        }
-        prnSlow("You have " + playerHealth + " health points");
-        Thread.sleep(200);
     }
 
     /**
