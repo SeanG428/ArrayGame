@@ -95,6 +95,7 @@ public class ArrayGame {
         nextInstructionPrep();
 
         prnSlow("You may also access your inventory by pressing i.");
+        prnSlow("The slot number is counted left to right, then continues down to the next line.");
         nextInstructionPrep();
 
         prnSlow("When given directions for input, it is very important to follow them.");
