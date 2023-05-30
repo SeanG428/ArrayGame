@@ -961,13 +961,14 @@ public class ArrayGame {
                     playerHealth = 100;
                 }
                 prnSlow("You have " + playerHealth + " health points");
-                Thread.sleep(200);
             } else {
                 prnSlow("You are out of this type of heal");
             }
         } else if (playerHealth == 100) {
             prnSlow("You are already at max health");
         }
+        
+        Thread.sleep(500);
     }
 
     /**
