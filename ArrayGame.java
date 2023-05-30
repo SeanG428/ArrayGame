@@ -27,7 +27,7 @@ public class ArrayGame {
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 0, -2, 0, -2, 0, -2 },
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
-            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 0, -2, 0, -2, 5, -2 },
+            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
@@ -46,7 +46,7 @@ public class ArrayGame {
     static int numOfSmallHeals = 0;
     static int numOfMediumHeals = 0;
     static int numOfLargeHeals = 0;
-    static int numOfSuspiciousHeals = 50;
+    static int numOfSuspiciousHeals = 0;
 
     /**
      * PLAN FOR GAME:
@@ -70,7 +70,7 @@ public class ArrayGame {
         while (!done) {
             playerDirection(map);
 
-            if (mapName.equals("dungeonStart") || mapName.equals("dungeonMiddle"))
+            if (mapName.equals("dungeonStart") || mapName.equals("dungeonMiddle") || mapName.equals("dungeonEnd"))
                 enemyDirection(map, map.length, map[0].length);
 
             printLocationArray(map, map.length, map[0].length);
@@ -106,6 +106,8 @@ public class ArrayGame {
         prnSlow("a) Move left");
         prnSlow("d) Move right");
         prnSlow("s) Stay where you are");
+        // Extra time needed to compensate for larger output
+        Thread.sleep(1000);
         nextInstructionPrep();
 
         prnSlow("You may also access your inventory by pressing i.");
@@ -612,7 +614,7 @@ public class ArrayGame {
             }
         } else if (attackType.equals("bow")) {
             int spaceBack = 0;
-            int distance = 40;
+            int distance = 20;
             for (int i = distance; i > 0; i--) {
                 clear();
                 printBowAttack(playerWithBow, enemy, arrow, distance, i, spaceBack, numOfEnemies);
@@ -1383,7 +1385,7 @@ public class ArrayGame {
                     { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
                     { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
                     { 5, 0, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 0, 5 },
-                    { 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
+                    { 5, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 5 },
                     { 0, 4, 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 0 } };
             return end;
         }
