@@ -38,7 +38,7 @@ public class ArrayGame {
     // Used to see if the user can close the inventory
     static boolean canClose = true;
 
-    static int playerHealth = 5;
+    static int playerHealth = 100;
     static int gold = 100;
     static int numOfNormalArrows = 10;
     static int numOfSharpArrows = 0;
@@ -59,7 +59,7 @@ public class ArrayGame {
      */
     public static void main(String[] args) throws Exception {
         clear();
-        // instructions();
+        instructions();
 
         // Spawn player
         map[10][8] = playerValue;
@@ -88,8 +88,13 @@ public class ArrayGame {
         prn("\u001B[31mYou Died\033[0m");
     }
 
+    /**
+     * Instructions to explain how to play the game
+     * 
+     * @throws InterruptedException
+     */
     public static void instructions() throws InterruptedException {
-        prnSlow("Welcome to Cave Dwellers!");
+        prnSlow("\033[1;37m\033[4;37mWelcome to Cave Dwellers!\033[0m");
         nextInstructionPrep();
         prnSlow("In this game, there is no main objective.");
         prnSlow("You may do as you wish and fight monsters as you please.");
@@ -462,8 +467,9 @@ public class ArrayGame {
                 }
                 int selection = Integer.parseInt(input.nextLine());
 
-                if (selection == 1) {
+                if (selection == 1) { // Attack with sword
                     int choice = 0;
+                    // If there is more than one enemy, ask player which to attack
                     if (enemiesLeft > 1) {
                         prnSlow("Which enemy will you attack?");
                         for (int count = 0; count < enemiesLeft; count++) {
@@ -480,10 +486,13 @@ public class ArrayGame {
                     attacks("sword", enemiesLeft);
                     enemyHealth[choice] -= playerInventory[0][1][1];
                     attacked = true;
-                } else if (selection == 2) {
+                } else if (selection == 2) { // Attack with bow and arrow
+                    // Get the number of the equipped arrow
                     int arrowNum = itemDesignation(playerInventory, "9", 0);
                     int numOfArrows = numOfSpecifiedItem(arrowNum, 0);
+                    // Make sure the player has arrows before attacking
                     if (numOfArrows > 0) {
+                        // Attack effects all enemies
                         attacks("bow", enemiesLeft);
                         for (int j = 0; j < enemiesLeft; j++) {
                             enemyHealth[j] -= playerInventory[0][3][1] * playerInventory[0][5][1];
@@ -504,6 +513,7 @@ public class ArrayGame {
             }
 
             // If the player is still alive, have enemies attack
+            // If the player is dead, end the fight
             if (playerDied() == false) {
                 // Check if there are any enemies left
                 for (int i = 0; i < enemyLocs.length; i++) {
@@ -527,7 +537,8 @@ public class ArrayGame {
                         playerHealth -= 10;
                     }
                 }
-            } else {
+            }
+            if (playerDied()) {
                 fighting = false;
             }
         }
@@ -857,6 +868,7 @@ public class ArrayGame {
                 Thread.sleep(1000);
             } else {
                 prnSlow("That input is not recognized");
+                Thread.sleep(1000);
             }
         }
         clear();
@@ -970,7 +982,7 @@ public class ArrayGame {
                         { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 2, -2, 0, -2 },
                         { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 15, -2, 25, -2, 0, -2 },
                         { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
-                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 10, -2, 20, -2, 30, -2, 5, -2 },
+                { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 10, -2, 20, -2, 30, -2, 0, -2 },
                         { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                         { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                         { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
@@ -992,10 +1004,13 @@ public class ArrayGame {
                 } else {
                     page = 0;
                 }
-            } else if (selection[0].equalsIgnoreCase("buy")) {
+            } else if (selection[0].equalsIgnoreCase("buy") && selection.length == 2) {
                 buy(shopItems, selection);
             } else if (selection[0].equalsIgnoreCase("close")) {
                 done = true;
+            } else {
+                prnSlow("That input is not recognized");
+                Thread.sleep(1000);
             }
         }
     }
@@ -1042,6 +1057,7 @@ public class ArrayGame {
 
             int price = costOfItem(boughtItem, numBought);
             if (price > gold) {
+                prnSlow("You do not have enough gold to purchase this item");
                 canBuy = false;
             } else {
                 prnSlow("The cost of your items is " + price + " gold");
