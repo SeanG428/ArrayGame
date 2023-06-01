@@ -9,8 +9,9 @@ public class ArrayGame {
     static Scanner input = new Scanner(System.in);
 
     // Starting map
-    static int[][] map = arrayImages("town");
+
     static String mapName = "town";
+    static int[][] map = arrayImages(mapName);
 
     // Important character symbols
     static String obstacle = "&";
@@ -22,6 +23,7 @@ public class ArrayGame {
     static int playerValue = 2;
     static int enemyValue = 3;
 
+    // static int[][][] playerInventory = new int[2][7][9]
     static int[][][] playerInventory = {
             { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2 },
@@ -967,7 +969,7 @@ public class ArrayGame {
         } else if (playerHealth == 100) {
             prnSlow("You are already at max health");
         }
-        
+
         Thread.sleep(500);
     }
 
