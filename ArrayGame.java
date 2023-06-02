@@ -1,15 +1,19 @@
 package ArrayGame;
 
 import java.util.Scanner;
+import java.io.FileReader;
+import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class ArrayGame {
     // TODO in later versions
     // Add boss fight
     // Add more functions to prevent incorrect input from breaking the game
     static Scanner input = new Scanner(System.in);
+    static String fileName = "SaveFile.txt";
 
     // Starting map
-
     static String mapName = "town";
     static int[][] map = arrayImages(mapName);
 
@@ -22,9 +26,7 @@ public class ArrayGame {
     static int obstacleValue = 1;
     static int playerValue = 2;
     static int enemyValue = 3;
-
-    // static int[][][] playerInventory = new int[2][7][9]
-    static int[][][] playerInventory = {
+    static int[][][] startingInventory = {
             { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 0, -2, 0, -2, 0, -2 },
@@ -33,22 +35,23 @@ public class ArrayGame {
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
+    static int[][][] playerInventory = startingInventory;
 
     // Page of inventory or shop
-    static int page = 0;
+    static int page;
 
     // Used to see if the user can close the inventory
     static boolean canClose = true;
 
-    static int playerHealth = 100;
-    static int gold = 100;
-    static int numOfNormalArrows = 10;
-    static int numOfSharpArrows = 0;
-    static int numOfExplosiveArrows = 0;
-    static int numOfSmallHeals = 0;
-    static int numOfMediumHeals = 0;
-    static int numOfLargeHeals = 0;
-    static int numOfSuspiciousHeals = 0;
+    static int playerHealth;
+    static int gold;
+    static int numOfNormalArrows;
+    static int numOfSharpArrows;
+    static int numOfExplosiveArrows;
+    static int numOfSmallHeals;
+    static int numOfMediumHeals;
+    static int numOfLargeHeals;
+    static int numOfSuspiciousHeals;
 
     /**
      * PLAN FOR GAME:
@@ -63,9 +66,7 @@ public class ArrayGame {
         clear();
         instructions();
 
-        // Spawn player
-        map[10][8] = playerValue;
-
+        readData();
         printLocationArray(map, map.length, map[0].length);
 
         boolean done = false;
@@ -112,6 +113,13 @@ public class ArrayGame {
         Thread.sleep(1000);
         nextInstructionPrep();
 
+        prnSlow("You can save the game by pressing Q or reset it by pressing R.");
+        prnSlow("When you reset the game, it must be closed before the data is completely gone.");
+        prnSlow("If you accidentally erase your data, your can recover it by saving the game.");
+        // Extra time needed to compensate for larger output
+        Thread.sleep(1000);
+        nextInstructionPrep();
+
         prnSlow("You may also access your inventory by pressing i.");
         prnSlow("The slot number is counted left to right, then continues down to the next line.");
         nextInstructionPrep();
@@ -129,6 +137,122 @@ public class ArrayGame {
     public static void nextInstructionPrep() throws InterruptedException {
         Thread.sleep(1000);
         clear();
+    }
+
+    /**
+     * Read game data from file
+     * Set variable values
+     * 
+     * @throws IOException
+     */
+    public static void readData() throws IOException {
+        Scanner saveData = new Scanner(new FileReader(fileName));
+
+        mapName = saveData.nextLine();
+        page = Integer.parseInt(saveData.nextLine());
+        playerHealth = Integer.parseInt(saveData.nextLine());
+        gold = Integer.parseInt(saveData.nextLine());
+        numOfNormalArrows = Integer.parseInt(saveData.nextLine());
+        numOfSharpArrows = Integer.parseInt(saveData.nextLine());
+        numOfExplosiveArrows = Integer.parseInt(saveData.nextLine());
+        numOfSmallHeals = Integer.parseInt(saveData.nextLine());
+        numOfMediumHeals = Integer.parseInt(saveData.nextLine());
+        numOfLargeHeals = Integer.parseInt(saveData.nextLine());
+        numOfSuspiciousHeals = Integer.parseInt(saveData.nextLine());
+
+        for (int i = 0; i < playerInventory.length; i++) {
+            for (int j = 0; j < playerInventory[i].length; j++) {
+                for (int k = 0; k < playerInventory[i][j].length; k++) {
+                    playerInventory[i][j][k] = Integer.parseInt(saveData.nextLine());
+                }
+            }
+        }
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                map[i][j] = Integer.parseInt(saveData.nextLine());
+            }
+        }
+
+        saveData.close();
+    }
+
+    /**
+     * Save game data to file
+     * 
+     * @throws IOException
+     */
+    public static void saveGame() throws IOException {
+        // TODO
+        // Allow game save
+        PrintWriter save = new PrintWriter(new FileWriter(fileName));
+
+        save.println(mapName);
+        save.println(page);
+        save.println(playerHealth);
+        save.println(gold);
+        save.println(numOfNormalArrows);
+        save.println(numOfSharpArrows);
+        save.println(numOfExplosiveArrows);
+        save.println(numOfSmallHeals);
+        save.println(numOfMediumHeals);
+        save.println(numOfLargeHeals);
+        save.println(numOfSuspiciousHeals);
+
+        for (int i = 0; i < playerInventory.length; i++) {
+            for (int j = 0; j < playerInventory[i].length; j++) {
+                for (int k = 0; k < playerInventory[i][j].length; k++) {
+                    save.println(playerInventory[i][j][k]);
+                }
+            }
+        }
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                save.println(map[i][j]);
+            }
+        }
+
+        save.close();
+    }
+
+    /**
+     * Reset data in the file to the original data
+     * 
+     * @throws IOException
+     */
+    public static void resetGame() throws IOException {
+        PrintWriter save = new PrintWriter(new FileWriter(fileName));
+
+        save.println("town");
+        save.println(0);
+        save.println(100);
+        save.println(100);
+        save.println(10);
+        save.println(0);
+        save.println(0);
+        save.println(0);
+        save.println(0);
+        save.println(0);
+        save.println(0);
+
+        for (int i = 0; i < startingInventory.length; i++) {
+            for (int j = 0; j < startingInventory[i].length; j++) {
+                for (int k = 0; k < startingInventory[i][j].length; k++) {
+                    save.println(startingInventory[i][j][k]);
+                }
+            }
+        }
+        int[][] resetMap = arrayImages("town");
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                if (i == 10 && j == 8) {
+                    save.println(playerValue);
+                } else {
+                    save.println(resetMap[i][j]);
+                }
+            }
+        }
+
+        save.close();
     }
 
     /**
@@ -159,8 +283,9 @@ public class ArrayGame {
      * 
      * @param map The current location array
      * @throws InterruptedException
+     * @throws IOException
      */
-    public static void playerDirection(int[][] map) throws InterruptedException {
+    public static void playerDirection(int[][] map) throws InterruptedException, IOException {
         int[] currentPlayerLoc = playerLoc(map);
 
         // boolean prevents enemies from moving before the player takes their turn
@@ -185,6 +310,12 @@ public class ArrayGame {
                 if (playerDied()) {
                     moved = true;
                 }
+            } else if (direction.equalsIgnoreCase("q")) {
+                // Save the game
+                saveGame();
+            } else if (direction.equalsIgnoreCase("r")) {
+                // Reset the game
+                resetGame();
             }
         }
     }
