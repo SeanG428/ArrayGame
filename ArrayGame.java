@@ -13,6 +13,8 @@ public class ArrayGame {
     static Scanner input = new Scanner(System.in);
     static String fileName = "SaveFile.txt";
 
+    static boolean played;
+
     // Starting map
     static String mapName = "town";
     static int[][] map = arrayImages(mapName);
@@ -64,9 +66,14 @@ public class ArrayGame {
      */
     public static void main(String[] args) throws Exception {
         clear();
-        instructions();
-
+        
         readData();
+
+        if (played == false) {
+            instructions();
+            played = true;
+        }
+
         printLocationArray(map, map.length, map[0].length);
 
         boolean done = false;
@@ -148,6 +155,7 @@ public class ArrayGame {
     public static void readData() throws IOException {
         Scanner saveData = new Scanner(new FileReader(fileName));
 
+        played = Boolean.parseBoolean(saveData.nextLine());
         mapName = saveData.nextLine();
         page = Integer.parseInt(saveData.nextLine());
         playerHealth = Integer.parseInt(saveData.nextLine());
@@ -182,10 +190,9 @@ public class ArrayGame {
      * @throws IOException
      */
     public static void saveGame() throws IOException {
-        // TODO
-        // Allow game save
         PrintWriter save = new PrintWriter(new FileWriter(fileName));
 
+        save.println(played);
         save.println(mapName);
         save.println(page);
         save.println(playerHealth);
@@ -222,6 +229,7 @@ public class ArrayGame {
     public static void resetGame() throws IOException {
         PrintWriter save = new PrintWriter(new FileWriter(fileName));
 
+        save.println(false);
         save.println("town");
         save.println(0);
         save.println(100);
@@ -279,6 +287,7 @@ public class ArrayGame {
      * Player chooses direction to travel in
      * W = up, X = down, A = left, D = right, S = stay
      * Press I to access inventory menu
+     * Press Q to save, and R to reset the game
      * Movement options loop until the player has taken their turn
      * 
      * @param map The current location array
@@ -312,9 +321,13 @@ public class ArrayGame {
                 }
             } else if (direction.equalsIgnoreCase("q")) {
                 // Save the game
+                prnSlow("You saved the game");
+                Thread.sleep(500);
                 saveGame();
             } else if (direction.equalsIgnoreCase("r")) {
                 // Reset the game
+                prnSlow("You reset the game");
+                Thread.sleep(500);
                 resetGame();
             }
         }
