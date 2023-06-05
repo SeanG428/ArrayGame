@@ -28,6 +28,8 @@ public class ArrayGame {
     static int obstacleValue = 1;
     static int playerValue = 2;
     static int enemyValue = 3;
+
+    // Starting inventory contains the initial values of the inventory for resets
     static int[][][] startingInventory = {
             { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2 },
@@ -37,7 +39,17 @@ public class ArrayGame {
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
                     { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
-    static int[][][] playerInventory = startingInventory;
+                    
+    // Player inventory is modified throughout the game and is used by the player
+    static int[][][] playerInventory = {
+            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 20, -2, 0, -2, 0, -2, 0, -2, },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 1, -2, 0, -2, 0, -2, 0, -2 },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 10, -2, 0, -2, 0, -2, 0, -2 },
+                    { 0, -1, -1, -1, -1, -1, -1, -1, 0 } },
+            { { 0, -1, -1, -1, -1, -1, -1, -1, 0 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { -2, -1, -1, -1, -1, -1, -1, -1, -2 }, { -2, 0, -2, 0, -2, 0, -2, 0, -2 },
+                    { 0, -1, -1, -1, -1, -1, -1, -1, 0 } } };
 
     // Page of inventory or shop
     static int page;
@@ -66,7 +78,7 @@ public class ArrayGame {
      */
     public static void main(String[] args) throws Exception {
         clear();
-        
+
         readData();
 
         if (played == false) {
